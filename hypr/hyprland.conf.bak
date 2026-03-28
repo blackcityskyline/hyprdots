@@ -1,0 +1,350 @@
+# Optimized Hyprland Configuration
+# Performance-focused while maintaining visual appeal
+source = ~/.config/hypr/keybinds.conf
+################
+### MONITORS ###
+################
+
+monitor=,preferred,auto,1
+
+
+###################
+### MY PROGRAMS ###
+###################
+
+$terminal = kitty 
+$fileManager = thunar 
+$menu = vicinae toggle
+$browser = zen-browser
+
+#################
+### AUTOSTART ###
+#################
+
+exec-once = waybar
+exec-once = swaync
+exec-once = waypaper --restore
+exec-once = ~/.local/bin/battery_monitor.sh
+exec-once = ~/bin/bluetooth-auto-switch.sh
+exec-once = wl-paste --watch cliphist store
+exec-once = vicinae server
+exec-once = avizo-service
+exec-once = avizo-client
+
+exec-once = swayidle -w \
+    timeout 300 './smartlock.sh' \
+    resume 'hyprctl dispatch dpms on' \
+    before-sleep 'hyprlock'
+
+# Auto-open applications on specific workspaces
+exec-once = [workspace special:magic silent] zen-browser
+
+
+#############################
+### ENVIRONMENT VARIABLES ###
+#############################
+
+env = XCURSOR_THEME,capitaine-cursors
+env = XCURSOR_SIZE,16
+
+# --- Optimized GPU acceleration ---
+env = LIBVA_DRIVER_NAME,i965
+env = VDPAU_DRIVER,va_gl
+env = WLR_RENDERER,auto
+env = WLR_NO_HARDWARE_CRSORS,1  # Changed to 1 - can help with some GPU issues
+
+
+#####################
+### LOOK AND FEEL ###
+#####################
+
+general {
+    gaps_in = 8
+    gaps_out = 16
+    border_size = 1                      # No borders, shadows only
+    layout = dwindle
+    resize_on_border = true
+    extend_border_grab_area = 15
+}
+
+decoration {
+    rounding = 12
+    
+    active_opacity = 0.98
+    inactive_opacity = 0.90  # Slightly less transparent for better performance
+    
+    shadow {
+        enabled = true
+        range = 25
+        render_power = 3
+        color = rgba(0, 0, 0, 0.8)
+        offset = 0 8
+    }
+    
+    blur {
+        enabled = false           # Disabled - this is what's killing your CPU!
+        size = 3
+        passes = 1
+        new_optimizations = true
+        xray = false
+        ignore_opacity = false
+        noise = 0
+        contrast = 1.0
+        brightness = 1.0
+        vibrancy = 0.1
+        vibrancy_darkness = 0.2
+        popups = true
+        popups_ignorealpha = 0.6
+    }
+    
+    dim_inactive = true
+    dim_strength = 0.08       # Reduced from 0.1
+    dim_special = 0.3         # Reduced from 0.4
+    dim_around = 0.5          # Reduced from 0.6
+}
+
+animations {
+    enabled = yes
+
+    # Optimized bezier curves
+    bezier = smooth, 0.4, 0.0, 0.2, 1.0
+    bezier = overshot, 0.13, 0.99, 0.29, 1.0
+
+    # Simplified animations - MUCH better performance
+    animation = windows, 1, 3, smooth, popin 95%
+    animation = windowsIn, 1, 2, smooth
+    animation = windowsOut, 1, 2, smooth
+    animation = windowsMove, 1, 2, smooth
+
+    animation = layers, 1, 2, smooth
+    animation = layersIn, 1, 2, smooth
+    animation = layersOut, 1, 2, smooth
+
+    animation = fade, 1, 3, smooth
+    animation = fadeIn, 1, 2, smooth
+    animation = fadeOut, 1, 2, smooth
+    animation = fadeSwitch, 0  # Disabled for performance
+    animation = fadeShadow, 1, 2, smooth
+    animation = fadeDim, 1, 2, smooth
+    animation = fadeLayers, 1, 2, smooth
+
+    # Border animations disabled
+    animation = border, 0
+    animation = borderangle, 0
+
+    animation = workspaces, 1, 3, smooth, slide
+    animation = workspacesIn, 1, 2, smooth
+    animation = workspacesOut, 1, 2, smooth
+
+    animation = specialWorkspace, 1, 3, overshot, slidevert
+    animation = specialWorkspaceIn, 1, 2, smooth
+    animation = specialWorkspaceOut, 1, 2, smooth
+}
+
+render {
+    direct_scanout = true
+}
+
+# Window Rules - Updated for Hyprland v0.53.3+
+# Отключить размытие и анимации для браузеров
+windowrule = no_blur on, match:class ^(zen|brave|chromium|google-chrome|firefox)$
+windowrule = no_anim on, match:class ^(zen|brave|chromium|google-chrome|firefox)$
+
+# Waypaper
+windowrule = float on, match:class ^(waypaper)$
+windowrule = move center, match:class ^(waypaper)$
+windowrule = size 1100 750, match:class ^(waypaper)$
+windowrule = border_size 0, match:class ^(waypaper)$
+windowrule = rounding 16, match:class ^(waypaper)$
+windowrule = opacity 0.95, match:class ^(waypaper)$ # opacity теперь одно значение!
+windowrule = stay_focused on, match:class ^(waypaper)$
+
+# Файловые менеджеры
+windowrule = float on, match:class ^(org.gnome.Nautilus|Thunar|dolphin|pcmanfm)$
+windowrule = move center, match:class ^(org.gnome.Nautilus|Thunar|dolphin|pcmanfm)$
+windowrule = size 1300 850, match:class ^(org.gnome.Nautilus|Thunar|dolphin|pcmanfm)$
+windowrule = border_color rgb(AAAAAA), match:class ^(org.gnome.Nautilus|Thunar|dolphin|pcmanfm)$
+windowrule = rounding 14, match:class ^(org.gnome.Nautilus|Thunar|dolphin|pcmanfm)$
+windowrule = opacity 0.96, match:class ^(org.gnome.Nautilus|Thunar|dolphin|pcmanfm)$
+
+# Центры управления
+windowrule = float on, match:class ^(gnome-control-center|lxappearance|pavucontrol|qt5ct|qt6ct)$
+windowrule = move center, match:class ^(gnome-control-center|lxappearance|pavucontrol|qt5ct|qt6ct)$
+windowrule = size 1100 750, match:class ^(gnome-control-center|lxappearance|pavucontrol|qt5ct|qt6ct)$
+windowrule = border_color rgb(AAAAAA), match:class ^(gnome-control-center|lxappearance|pavucontrol|qt5ct|qt6ct)$
+windowrule = rounding 12, match:class ^(gnome-control-center|lxappearance|pavucontrol|qt5ct|qt6ct)$
+windowrule = opacity 0.95, match:class ^(gnome-control-center|lxappearance|pavucontrol|qt5ct|qt6ct)$
+windowrule = stay_focused on, match:class ^(gnome-control-center|lxappearance|pavucontrol|qt5ct|qt6ct)$
+
+# Мессенджеры
+windowrule = float on, match:class ^(discord|TelegramDesktop|slack|teams|whatsapp-for-linux)$
+windowrule = move center, match:class ^(discord|TelegramDesktop|slack|teams|whatsapp-for-linux)$
+windowrule = size 1400 900, match:class ^(discord|TelegramDesktop|slack|teams|whatsapp-for-linux)$
+windowrule = border_color rgb(AAAAAA), match:class ^(discord|TelegramDesktop|slack|teams|whatsapp-for-linux)$
+windowrule = rounding 12, match:class ^(discord|TelegramDesktop|slack|teams|whatsapp-for-linux)$
+windowrule = opacity 0.97, match:class ^(discord|TelegramDesktop|slack|teams|whatsapp-for-linux)$
+
+# Плавающие терминалы
+windowrule = float on, match:title ^(float-term|popup-term)$
+windowrule = move center, match:title ^(float-term|popup-term)$
+windowrule = size 1100 650, match:title ^(float-term|popup-term)$
+windowrule = border_color rgb(AAAAAA), match:title ^(float-term|popup-term)$
+windowrule = rounding 12, match:title ^(float-term|popup-term)$
+windowrule = opacity 0.94, match:title ^(float-term|popup-term)$
+
+# Утилиты
+windowrule = float on, match:class ^(gnome-calculator|galculator|qalculate-gtk|htop|btop|nvtop)$
+windowrule = move center, match:class ^(gnome-calculator|galculator|qalculate-gtk|htop|btop|nvtop)$
+windowrule = rounding 10, match:class ^(gnome-calculator|galculator|qalculate-gtk|htop|btop|nvtop)$
+windowrule = opacity 0.94, match:class ^(gnome-calculator|galculator|qalculate-gtk|htop|btop|nvtop)$
+windowrule = border_color rgb(AAAAAA), match:class ^(gnome-calculator|galculator|qalculate-gtk|htop|btop|nvtop)$
+
+# Просмотр медиа
+windowrule = float on, match:class ^(eog|gwenview|feh|imv|mpv|vlc)$
+windowrule = move center, match:class ^(eog|gwenview|feh|imv|mpv|vlc)$
+windowrule = rounding 10, match:class ^(eog|gwenview|feh|imv|mpv|vlc)$
+windowrule = opacity 0.98, match:class ^(eog|gwenview|feh|imv|mpv|vlc)$
+
+# Лаунчеры
+windowrule = float on, match:class ^(rofi|wofi|tofi|vicinae)$
+windowrule = move center, match:class ^(rofi|wofi|tofi|vicinae)$
+windowrule = rounding 12, match:class ^(rofi|wofi|tofi|vicinae)$
+windowrule = opacity 0.93, match:class ^(rofi|wofi|tofi|vicinae)$
+windowrule = stay_focused on, match:class ^(rofi|wofi|tofi|vicinae)$
+
+# Картинка в картинке
+windowrule = float on, match:title ^(Picture-in-Picture|PiP)$
+windowrule = pin on, match:title ^(Picture-in-Picture|PiP)$
+windowrule = rounding 8, match:title ^(Picture-in-Picture|PiP)$
+windowrule = opacity 0.98, match:title ^(Picture-in-Picture|PiP)$
+windowrule = size 480 270, match:title ^(Picture-in-Picture|PiP)$
+
+# Обёрнутые приложения (Flatpak)
+windowrule = float on, match:class ^(\..*-wrapped)$
+windowrule = move center, match:class ^(\..*-wrapped)$
+windowrule = rounding 12, match:class ^(\..*-wrapped)$
+windowrule = opacity 0.95, match:class ^(\..*-wrapped)$
+
+
+dwindle {
+    pseudotile = true
+    preserve_split = true
+    smart_split = false          # Disabled for slight performance gain
+    smart_resizing = true
+    permanent_direction_override = false
+    special_scale_factor = 0.95
+    split_width_multiplier = 1.2
+    use_active_for_splits = true
+    default_split_ratio = 1.2
+}
+
+master {
+    new_status = master
+    new_on_top = true
+    orientation = left
+    # inherit_fullscreen = true
+    smart_resizing = true
+    drop_at_cursor = false
+    mfact = 0.5
+}
+
+misc {
+    # Visual Settings
+    force_default_wallpaper = 0
+    disable_hyprland_logo = true
+    disable_splash_rendering = true
+    
+    # Performance Optimizations
+    vfr = true
+    vrr = 1                             # Changed to 1 (fullscreen only) for stability
+    mouse_move_enables_dpms = true
+    key_press_enables_dpms = true
+    always_follow_on_dnd = true
+    layers_hog_keyboard_focus = true
+    animate_manual_resizes = false      # Disabled for better resize performance
+    animate_mouse_windowdragging = false # Disabled for smoother dragging
+    disable_autoreload = false
+    
+    # Focus & Window Management
+    focus_on_activate = true
+    mouse_move_focuses_monitor = true
+    
+    # Advanced Behavior
+    allow_session_lock_restore = true
+    background_color = 0x000000
+    close_special_on_empty = true
+    on_focus_under_fullscreen = 1
+    initial_workspace_tracking = 1
+    middle_click_paste = true
+    
+    # Reduced resource usage
+    enable_swallow = false              # Disabled for stability
+}
+
+
+#############
+### INPUT ###
+#############
+
+input {
+    kb_layout = us,ru
+    kb_variant =
+    kb_model =
+    kb_options = grp:alt_shift_toggle
+
+    kb_rules =
+
+    follow_mouse = 1
+    mouse_refocus = false
+    float_switch_override_focus = 2
+
+    sensitivity = 0
+    accel_profile = flat
+
+    touchpad {
+        natural_scroll = false          
+        tap-to-click = true
+        tap-and-drag = true
+        drag_lock = true
+        disable_while_typing = true
+        middle_button_emulation = true
+        scroll_factor = 0.3
+    }
+
+    numlock_by_default = true
+}
+
+gestures {
+    # Workspace swipe gestures (if supported by your Hyprland version)
+    # workspace_swipe = on
+}
+
+device {
+    name = epic-mouse-v1
+    sensitivity = -0.5
+}
+
+
+
+
+##############################
+### WINDOWS AND WORKSPACES ###
+##############################
+
+# Layer rules - Updated for Hyprland 0.53.3+
+# Правило должно содержать условие 'match:namespace'
+
+layerrule = blur on, match:namespace ^(waybar)$
+layerrule = ignore_alpha 0.2, match:namespace ^(waybar)$
+
+layerrule = blur on, match:namespace ^(rofi)$
+layerrule = ignore_alpha 0.2, match:namespace ^(rofi)$
+
+layerrule = blur on, match:namespace ^(notifications)$
+layerrule = ignore_alpha 0.3, match:namespace ^(notifications)$
+
+# Workspace rules
+workspace = 1, default:true
+workspace = 3
+workspace = special:magic, on-created-empty:google-chrome
+workspace = special:terminal, on-created-empty:$terminal
