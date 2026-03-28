@@ -1,0 +1,173 @@
+/* ~/.config/rofi/finder/finder.rasi */
+/* Shift+Right / Shift+Left — переключение между FIND и GREP */
+@import "../themes/tokyonight-night.rasi"
+
+configuration {
+    modi:                       "find:~/.config/rofi/finder/rofi-finder.sh,grep:~/.config/rofi/finder/rofi-grep.sh";
+    show-icons:                 false;
+    display-find:               " FIND";
+    display-grep:               " GREP";
+
+    matching:                   "fuzzy";
+    sort:                       true;
+    sorting-method:             "fzf";
+    case-sensitive:             false;
+
+    kb-custom-1:                "ctrl+y";   /* grep: скопировать путь */
+}
+
+/*****----- Main Window -----*****/
+window {
+    transparency:                "real";
+    location:                    center;
+    anchor:                      center;
+    fullscreen:                  false;
+    width:                       800px;
+    border-radius:               15px;
+    cursor:                      "default";
+    background-color:            @background;
+    border:                      1px;
+    border-color:                @border-color;
+}
+
+/*****----- Main Box -----*****/
+mainbox {
+    enabled:                     true;
+    spacing:                     10px;
+    padding:                     10px;
+    background-color:            transparent;
+    orientation:                 horizontal;
+    children:                    [ "left-panel", "message" ];
+}
+
+left-panel {
+    orientation:                 vertical;
+    spacing:                     10px;
+    background-color:            transparent;
+    children:                    [ "inputbar", "mode-switcher", "listview" ];
+    expand:                      true;
+}
+
+/*****----- Inputbar -----*****/
+inputbar {
+    enabled:                     true;
+    spacing:                     6px;
+    padding:                     8px;
+    border-radius:               10px;
+    background-color:            @background-alt;
+    text-color:                  @foreground;
+    children:                    [ "textbox-prompt-colon", "entry" ];
+    border:                      0px;
+    expand:                      false;
+}
+textbox-prompt-colon {
+    enabled:                     true;
+    expand:                      false;
+    str:                         "";
+    background-color:            inherit;
+    text-color:                  @accent-primary;
+    font:                        "JetBrains Mono Nerd Font Bold 10";
+}
+entry {
+    enabled:                     true;
+    background-color:            inherit;
+    text-color:                  inherit;
+    cursor:                      text;
+    placeholder:                 "Search...";
+    placeholder-color:           @foreground-dim;
+    cursor-color:                @accent-secondary;
+    expand:                      true;
+}
+
+/*****----- Mode Switcher -----*****/
+mode-switcher {
+    enabled:                     true;
+    spacing:                     10px;
+    background-color:            transparent;
+    expand:                      false;
+    border:                      0;
+}
+button {
+    padding:                     8px;
+    border-radius:               10px;
+    background-color:            @background-alt;
+    text-color:                  @foreground-alt;
+    cursor:                      pointer;
+    border:                      0px;
+}
+button selected {
+    background-color:            @background-highlight;
+    text-color:                  @accent-primary;
+}
+
+/*****----- Listview -----*****/
+listview {
+    enabled:                     true;
+    columns:                     1;
+    lines:                       8;
+    cycle:                       true;
+    dynamic:                     true;
+    scrollbar:                   false;
+    layout:                      vertical;
+    fixed-height:                true;
+    fixed-columns:               true;
+    spacing:                     6px;
+    background-color:            transparent;
+    text-color:                  @foreground;
+    expand:                      true;
+    border:                      0;
+}
+
+/*****----- Elements -----*****/
+element {
+    spacing:                     8px;
+    padding:                     8px;
+    border-radius:               10px;
+    background-color:            transparent;
+    text-color:                  @foreground-alt;
+    cursor:                      pointer;
+}
+element normal.normal    { background-color: transparent;            text-color: @foreground-alt; }
+element alternate.normal { background-color: transparent;            text-color: @foreground-alt; }
+element selected.normal  { background-color: @background-highlight;  text-color: @selected-text; border: 0px; }
+
+element-icon { background-color: transparent; size: 0px; }
+element-text {
+    background-color:            transparent;
+    text-color:                  inherit;
+    cursor:                      inherit;
+    vertical-align:              0.5;
+    horizontal-align:            0.0;
+    highlight:                   @accent-secondary;
+    font:                        "JetBrains Mono Nerd Font 9";
+}
+
+/*****----- Preview Panel (finder) / Status (grep) -----*****/
+message {
+    background-color:            transparent;
+    expand:                      false;
+    width:                       300px;
+}
+textbox {
+    padding:                     12px;
+    border-radius:               10px;
+    background-color:            @background-alt;
+    text-color:                  @foreground;
+    vertical-align:              0.0;
+    horizontal-align:            0.0;
+    border:                      1px;
+    border-color:                @border-color;
+    font:                        "JetBrains Mono Nerd Font 9";
+    markup:                      true;
+    expand:                      true;
+    word-wrap:                   true;
+}
+
+error-message {
+    padding:                     15px;
+    border-radius:               20px;
+    background-color:            @background;
+    text-color:                  @urgent;
+    border:                      2px;
+    border-color:                @urgent;
+}

@@ -1,0 +1,99 @@
+@import "../themes/tokyonight-night.rasi"
+
+window {
+    width:            250px;
+    border-radius:    12px;
+    background-color: @background;
+    border:           1px;
+    border-color:     @border-color;
+    cursor:           "default";
+    location:         northeast;
+    anchor:           northeast;
+    x-offset:         -18px;
+    y-offset:         15px;
+}
+
+mainbox {
+    spacing:          8px;
+    padding:          8px;
+    background-color: transparent;
+    orientation:      vertical;
+    children:         [ "inputbar", "listview" ];
+}
+
+inputbar {
+    spacing:          6px;
+    padding:          8px;
+    border-radius:    10px;
+    background-color: @background-alt;
+    text-color:       @foreground;
+    children:         [ "textbox-prompt-colon", "entry" ];
+    border:           0px;
+    expand:           false;
+}
+
+textbox-prompt-colon {
+    expand:           false;
+    str:              "";
+    background-color: inherit;
+    text-color:       @accent-secondary;
+    font:             "JetBrains Mono Nerd Font Bold 10";
+}
+
+entry {
+    background-color: inherit;
+    text-color:       inherit;
+    cursor:           text;
+    placeholder:      "";
+    placeholder-color: @foreground-dim;
+    expand:           true;
+}
+
+listview {
+    columns:          1;
+    lines:            10;
+    cycle:            true;
+    dynamic:          true;
+    scrollbar:        false;
+    layout:           vertical;
+    fixed-height:     false;
+    spacing:          2px;
+    background-color: transparent;
+    cursor:           "default";
+    border:           0;
+}
+
+element {
+    orientation:      horizontal;
+    spacing:          0px;
+    padding:          5px 10px;
+    border-radius:    8px;
+    background-color: transparent;
+    text-color:       @foreground-alt;
+    cursor:           pointer;
+    children:         [ "element-text" ];
+}
+
+element-text {
+    background-color: transparent;
+    text-color:       inherit;
+    cursor:           inherit;
+    vertical-align:   0.5;
+    horizontal-align: 0.0;
+}
+
+element normal.normal    { background-color: transparent;           text-color: @foreground-alt; }
+element alternate.normal { background-color: transparent;           text-color: @foreground-alt; }
+element selected.normal  { background-color: @background-highlight; text-color: @selected-text;  }
+
+element normal.urgent    { background-color: @background-visual;    text-color: @urgent;         }
+element selected.urgent  { background-color: @background-highlight; text-color: @urgent;         }
+
+error-message {
+    padding:          15px;
+    border-radius:    10px;
+    background-color: @background;
+    text-color:       @urgent;
+    border:           1px;
+    border-color:     @urgent;
+}

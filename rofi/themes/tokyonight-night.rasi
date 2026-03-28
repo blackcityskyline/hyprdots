@@ -1,0 +1,33 @@
+/* ~/.config/rofi/themes/tokyonight-night.rasi */
+* {
+    /* Основные фоны */
+    background:                  #1a1b26;   /* фон окна (window-bg) */
+    background-alt:              #16161e;   /* фон поля ввода (input-bg) */
+    background-dark:             #0f0f14;
+    background-highlight:        #2d3348;   /* фон выделенного элемента (item-bg-selected) */
+    background-sidebar:          #1a1b26;
+    background-visual:           #28344a;
+
+    /* Текст */
+    foreground:                  #c0caf5;   /* цвет текста ввода и элементов (input-fg, item-fg) */
+    foreground-alt:              #a9b1d6;
+    foreground-dim:              #565f89;
+
+    /* Акценты */
+    selected:                    #2f3349;   /* не используется */
+    selected-text:               #c0caf5;   /* цвет текста выделенного элемента */
+    active:                      #9ece6a;
+    urgent:                      #f7768e;
+
+    accent-primary:              #c0caf5;   /* рамка выделения (item-border-selected) */
+    accent-secondary:            #bb9af7;   /* курсор, подсветка поиска */
+    accent-warning:              #ff9e64;
+    accent-info:                 #2ac3de;
+
+    /* Границы */
+    border-color:                #3b4261;   /* рамка окна */
+    border-highlight:            #bb9af7;   /* не используется */
+
+    /* Шрифт */
+    font:                        "JetBrains Mono Nerd Font 10";
+}

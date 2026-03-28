@@ -1,0 +1,47 @@
+[global]
+    font = "JetBrains Mono 10"
+    width = 300
+    height = 300
+    offset = "30x30"
+    origin = "top-right"
+    transparency = 20
+    frame_color = "#7aa2f7"
+    separator_color = "frame"
+
+[urgency_low]
+    background = "#1a1b26"
+    foreground = "#c0caf5"
+    timeout = 5
+
+[urgency_normal]
+    background = "#1a1b26"
+    foreground = "#c0caf5"
+    timeout = 10
+
+[urgency_critical]
+    background = "#1a1b26"
+    foreground = "#f7768e"
+    timeout = 0global]
+    font = "JetBrains Mono 10"
+    width = 300
+    height = 300
+    offset = "30x30"
+    origin = "top-right"
+    transparency = 20
+    frame_color = "#7aa2f7"
+    separator_color = "frame"
+
+[urgency_low]
+    background = "#1a1b26"
+    foreground = "#c0caf5"
+    timeout = 5
+
+[urgency_normal]
+    background = "#1a1b26"
+    foreground = "#c0caf5"
+    timeout = 10
+
+[urgency_critical]
+    background = "#1a1b26"
+    foreground = "#f7768e"
+    timeout = 0

@@ -1,0 +1,468 @@
+#!/usr/bin/env bash
+
+# ~/.config/rofi/finder/finder.sh
+# Enter        → 1й Enter на файле = превью, 2й Enter = открыть
+# Ctrl+Return  → открыть в файловом менеджере
+
+: "${TERMINAL:=alacritty}"
+: "${EDITOR_CMD:=nvim}"
+: "${START_DIR:=$HOME}"
+: "${MAX_RESULTS:=5000}"
+: "${CACHE_TTL:=300}"
+: "${RECENT_COUNT:=10}"
+
+if [ -z "$ROFI_OUTSIDE" ]; then
+  exec rofi \
+    -show find \
+    -modi "find:$0,grep:~/.config/rofi/finder/grep.sh" \
+    -config ~/.config/rofi/finder/finder.rasi
+fi
+
+export ROFI_OUTSIDE=1
+
+TEXT_EXT='txt|md|markdown|rst|c|cpp|h|hpp|py|sh|bash|zsh|fish|conf|ini|cfg|env|log|json|jsonc|yaml|yml|toml|tex|xml|html|htm|xhtml|css|scss|sass|js|mjs|ts|jsx|tsx|svelte|vue|rs|go|php|rb|lua|vim|el|hs|ml|ex|exs|dart|kt|swift|java|cs|r|sql|tf|hcl'
+
+SEARCH_DIRS=(
+  "$HOME/.config"
+  "$HOME/Documents"
+  "$HOME/Desktop"
+  "$HOME/Git"
+  "$HOME/notes"
+  "$HOME/bin"
+  "$HOME/apps"
+  "$HOME/Downloads"
+  "/etc"
+)
+
+FD_EXCLUDES=(
+  # VCS / сборка
+  -E '.git' -E '__pycache__' -E '.mypy_cache'
+  -E 'target' -E 'build' -E 'dist' -E 'node_modules'
+  # Браузеры
+  -E 'BraveSoftware' -E 'chromium' -E 'chromium-backup'
+  -E 'google-chrome' -E 'google-chrome-backup'
+  -E 'waterfox' -E '.mozilla' -E 'vivaldi' -E 'microsoftedge' -E 'Min'
+  # Тяжёлые приложения
+  -E 'heroic' -E 'obs-studio' -E 'sunshine'
+  -E '.tlauncher' -E '.minecraft'
+  # Nvim плагины
+  -E 'lazy' -E 'mason' -E 'jdhao'
+  # KDE/GTK мусор
+  -E 'gtk-2.0' -E 'gtk-3.0' -E 'gtk-4.0'
+  -E 'Kvantum' -E 'KDE' -E 'plasma' -E 'kwin'
+  -E 'pulse' -E 'wal' -E 'fontconfig'
+  # Приложения с большими данными
+  -E 'Bitwarden' -E 'Session' -E 'Session-development'
+  # Downloads мусор
+  -E 'mcmods' -E 'mods' -E 'widgets'
+)
+
+if ! command -v fd &>/dev/null; then
+  echo "fd not found"
+  exit 1
+fi
+
+CACHE_DIR="/tmp/rofi-finder-cache"
+mkdir -p "$CACHE_DIR"
+
+trap 'rm -f "${_tmpd:-}" "${_tmpf:-}" "${_tmpr:-}"' EXIT INT TERM
+
+# ── pango escape ──────────────────────────────────────────────────────────────
+pe() {
+  local s="${1//&/&amp;}"
+  s="${s//</&lt;}"
+  s="${s//>/&gt;}"
+  printf '%s' "$s"
+}
+
+# ── Иконка по расширению ──────────────────────────────────────────────────────
+file_icon() {
+  local f="${1##*/}"
+  local ext="${f##*.}"
+  [[ "$ext" == "$f" ]] && ext=""
+  ext="${ext,,}"
+  case "$ext" in
+    md|markdown|rst)            echo "󰧮" ;;
+    txt)                        echo "󰈙" ;;
+    sh|bash|zsh|fish)           echo "" ;;
+    py)                         echo "" ;;
+    rs)                         echo "" ;;
+    go)                         echo "" ;;
+    js|mjs|ts|jsx|tsx|svelte|vue) echo "" ;;
+    json|jsonc|yaml|yml|toml)   echo "" ;;
+    conf|ini|cfg|env|rasi)      echo "" ;;
+    html|htm|css|scss|sass)     echo "" ;;
+    c|cpp|h|hpp)                echo "" ;;
+    java|kt|swift|cs)           echo "" ;;
+    rb|php|lua|el|hs|ml)        echo "" ;;
+    sql)                        echo "" ;;
+    png|jpg|jpeg|gif|webp)      echo "󰋩" ;;
+    svg)                        echo "󰜡" ;;
+    mp3|flac|wav|ogg|opus)      echo "󰎆" ;;
+    mp4|mkv|avi|mov|webm)       echo "󰕧" ;;
+    pdf)                        echo "" ;;
+    zip|tar|gz|bz2|xz|zst|7z)  echo "󰏗" ;;
+    *)                          echo "󰈔" ;;
+  esac
+}
+
+# ── Недавние файлы по всем SEARCH_DIRS ───────────────────────────────────────
+get_recent_all() {
+  local existing_dirs=()
+  for d in "${SEARCH_DIRS[@]}"; do
+    [[ -d "$d" ]] && existing_dirs+=("$d")
+  done
+  local prefix="${HOME%/}/"
+
+  fd --hidden --type f "${FD_EXCLUDES[@]}" --max-results=500 . "${existing_dirs[@]}" 2>/dev/null |
+    xargs -d'\n' stat --printf='%Y\t%n\n' 2>/dev/null |
+    sort -rn |
+    head -"$RECENT_COUNT" |
+    while IFS=$'\t' read -r _ path; do
+      local rel="${path#"$prefix"}"
+      local icon
+      icon="$(file_icon "$path")"
+      printf '󱦟 %s %s\t%s\n' "$icon" "$rel" "$path"
+    done
+}
+
+# ── Недавние файлы в папке ────────────────────────────────────────────────────
+get_recent() {
+  local dir="$1"
+  local prefix="${dir%/}/"
+  [[ "$dir" == "/" ]] && prefix="/"
+
+  fd --hidden --type f "${FD_EXCLUDES[@]}" --max-results=200 . "$dir" 2>/dev/null |
+    xargs -d'\n' stat --printf='%Y\t%n\n' 2>/dev/null |
+    sort -rn |
+    head -"$RECENT_COUNT" |
+    while IFS=$'\t' read -r _ path; do
+      local rel="${path#"$prefix"}"
+      local icon
+      icon="$(file_icon "$path")"
+      printf '󱦟 %s %s\t%s\n' "$icon" "$rel" "$path"
+    done
+}
+
+# ── Превью ────────────────────────────────────────────────────────────────────
+show_preview() {
+  local path="$1"
+  [[ ! -e "$path" ]] && printf '\x00message\x1f \n' && return
+
+  local base="${path##*/}"
+  local name msg
+  name="$(pe "$base")"
+
+  if [[ -d "$path" ]]; then
+    local count raw_listing listing
+    count="$(ls -1 "$path" 2>/dev/null | wc -l)"
+    raw_listing="$(ls -1p "$path" 2>/dev/null | head -6 | tr '\n' ' ')"
+    listing="$(pe "$raw_listing")"
+    msg="<b><span foreground=\"#7aa2f7\">  ${name}</span></b>  <span size=\"small\" alpha=\"70%\">${count} items</span>
+<span foreground=\"#565f89\" size=\"small\">${listing}</span>"
+
+  elif [[ -f "$path" ]]; then
+    local mime size lines header
+    mime="$(file --mime-type -b "$path" 2>/dev/null)"
+    size="$(du -h "$path" 2>/dev/null | cut -f1)"
+    header="<b><span foreground=\"#9ece6a\">${name}</span></b>  <span size=\"small\" alpha=\"60%\">${size} · ${mime}</span>"
+
+    if [[ "$mime" == text/* || "$path" =~ \.($TEXT_EXT)$ ]]; then
+      local raw_lines
+      raw_lines="$(head -5 "$path" 2>/dev/null |
+        tr -d '\000-\010\013-\037' |
+        tr '\t' ' ' |
+        awk '{printf "%s  ░  ", substr($0,1,80)}' |
+        cut -c1-400)"
+      lines="$(pe "$raw_lines")"
+      msg="${header}
+<tt><small><span foreground=\"#a9b1d6\">${lines}</span></small></tt>"
+
+    elif [[ "$mime" == image/* ]]; then
+      if command -v chafa &>/dev/null; then
+        local raw_chafa
+        raw_chafa="$(chafa --format=symbols --size=38x8 --animate=off "$path" 2>/dev/null | head -8)"
+        msg="<b><span foreground=\"#e0af68\">🖼 ${name}</span></b>  <span size=\"small\" alpha=\"60%\">${size} · ${mime}</span>
+<tt><small>$(pe "$raw_chafa")</small></tt>"
+      else
+        msg="<b><span foreground=\"#e0af68\">🖼 ${name}</span></b>  <span size=\"small\" alpha=\"60%\">${size} · ${mime}</span>"
+      fi
+
+    elif [[ "$mime" == audio/* ]]; then
+      local tags=""
+      if command -v ffprobe &>/dev/null; then
+        tags="$(ffprobe -v quiet -show_entries format_tags=title,artist,album \
+          -of default=noprint_wrappers=1 "$path" 2>/dev/null |
+          grep -E '^TAG:(title|artist|album)=' |
+          sed 's/TAG://' | tr '\n' '  ')"
+        tags="$(pe "$tags")"
+      fi
+      msg="<b><span foreground=\"#bb9af7\">🎵 ${name}</span></b>  <span size=\"small\" alpha=\"60%\">${size}</span>
+<span size=\"small\" foreground=\"#a9b1d6\">${tags}</span>"
+
+    elif [[ "$mime" == video/* ]]; then
+      local duration=""
+      if command -v ffprobe &>/dev/null; then
+        duration="$(ffprobe -v quiet -show_entries format=duration \
+          -of default=noprint_wrappers=1:nokey=1 "$path" 2>/dev/null |
+          awk '{printf "%d:%02d", $1/60, $1%60}')"
+      fi
+      msg="<b><span foreground=\"#f7768e\">🎬 ${name}</span></b>  <span size=\"small\" alpha=\"60%\">${size}${duration:+ · }${duration}</span>"
+
+    else
+      msg="${header}"
+    fi
+  fi
+
+  printf '\x00message\x1f%s\n' "$msg"
+}
+
+# ── Заголовок ─────────────────────────────────────────────────────────────────
+print_directives() {
+  local dir="$1" data="$2"
+  printf '\x00data\x1f%s\n' "$data"
+  local disp
+  if [[ "$dir" == "$HOME" ]]; then
+    disp="~"
+  elif [[ "$dir" == "$HOME/"* ]]; then
+    disp="~/${dir#"$HOME/"}"
+  else
+    disp="$dir"
+  fi
+  printf '\x00prompt\x1f FIND %s\n' "$disp"
+}
+
+# ── Shallow: мгновенный список ────────────────────────────────────────────────
+build_list_shallow() {
+  local dir="$1"
+  local parent="${dir%/*}"
+  [[ -z "$parent" ]] && parent="/"
+
+  if [[ "$dir" == "$START_DIR" ]]; then
+    for d in "${SEARCH_DIRS[@]}"; do
+      [[ ! -e "$d" ]] && continue
+      local rel="${d#"$HOME/"}"
+      if [[ -d "$d" ]]; then
+        printf ' %s\t%s\n' "$rel" "$d"
+      else
+        local icon
+        icon="$(file_icon "$d")"
+        printf '%s %s\t%s\n' "$icon" "$rel" "$d"
+      fi
+    done
+  else
+    [[ "$dir" != "/" ]] && printf '󰁮 ../\t%s\n' "$parent"
+    local prefix="${dir%/}/"
+    [[ "$dir" == "/" ]] && prefix="/"
+    while IFS= read -r entry; do
+      local full="${prefix}${entry}"
+      if [[ -d "$full" ]]; then
+        printf ' %s\t%s\n' "$entry" "$full"
+      else
+        local icon
+        icon="$(file_icon "$full")"
+        printf '%s %s\t%s\n' "$icon" "$entry" "$full"
+      fi
+    done < <(ls -A "$dir" 2>/dev/null | sort)
+  fi
+}
+
+# ── Полный глубокий — для кэша ────────────────────────────────────────────────
+build_list() {
+  local dir="$1"
+  local parent="${dir%/*}"
+  [[ -z "$parent" ]] && parent="/"
+  [[ "$dir" != "/" ]] && printf '󰁮 ../\t%s\n' "$parent"
+  local prefix="${dir%/}/"
+  [[ "$dir" == "/" ]] && prefix="/"
+
+  local _tmpr _tmpd _tmpf
+  _tmpd="$(mktemp -p "$CACHE_DIR")"
+  _tmpf="$(mktemp -p "$CACHE_DIR")"
+
+  if [[ "$dir" == "$START_DIR" ]]; then
+    # Недавние файлы по всем SEARCH_DIRS
+    _tmpr="$(mktemp -p "$CACHE_DIR")"
+    get_recent_all > "$_tmpr" &
+    local pid_r=$!
+
+    local existing_dirs=()
+    for d in "${SEARCH_DIRS[@]}"; do
+      [[ -e "$d" ]] && existing_dirs+=("$d")
+    done
+
+    fd --hidden --type d --max-depth 1 "${FD_EXCLUDES[@]}" . "${existing_dirs[@]}" 2>/dev/null |
+      sort |
+      awk -v h="$HOME/" '{rel=$0; sub(h,"",rel); printf " %s\t%s\n", rel, $0}' \
+      > "$_tmpd" &
+    local pid_d=$!
+
+    fd --hidden --type f "${FD_EXCLUDES[@]}" --max-results="$MAX_RESULTS" . "${existing_dirs[@]}" 2>/dev/null |
+      sort |
+      while IFS= read -r path; do
+        local rel="${path#"$HOME/"}"
+        local icon
+        icon="$(file_icon "$path")"
+        printf '%s %s\t%s\n' "$icon" "$rel" "$path"
+      done \
+      > "$_tmpf" &
+    local pid_f=$!
+
+    wait "$pid_r"
+    if [[ -s "$_tmpr" ]]; then
+      cat "$_tmpr"
+      printf '─────────────────────────────\t\n'
+    fi
+    rm -f "$_tmpr"
+
+  else
+    if [[ "$dir" == "$HOME" || "$dir" == "$HOME/"* ]]; then
+      _tmpr="$(mktemp -p "$CACHE_DIR")"
+      get_recent "$dir" > "$_tmpr" &
+      local pid_r=$!
+    fi
+
+    fd --hidden --type d --max-depth 1 "${FD_EXCLUDES[@]}" . "$dir" 2>/dev/null |
+      sort |
+      awk -v p="$prefix" '{rel=substr($0, length(p)+1); printf " %s\t%s\n", rel, $0}' \
+      > "$_tmpd" &
+    local pid_d=$!
+
+    fd --hidden --type f "${FD_EXCLUDES[@]}" --max-results="$MAX_RESULTS" . "$dir" 2>/dev/null |
+      sort |
+      while IFS= read -r path; do
+        local rel="${path#"$prefix"}"
+        local icon
+        icon="$(file_icon "$path")"
+        printf '%s %s\t%s\n' "$icon" "$rel" "$path"
+      done \
+      > "$_tmpf" &
+    local pid_f=$!
+
+    if [[ -n "${pid_r:-}" ]]; then
+      wait "$pid_r"
+      if [[ -s "$_tmpr" ]]; then
+        cat "$_tmpr"
+        printf '─────────────────────────────\t\n'
+      fi
+      rm -f "$_tmpr"
+    fi
+  fi
+
+  wait "$pid_d"; cat "$_tmpd"
+  wait "$pid_f"; cat "$_tmpf"
+  rm -f "$_tmpd" "$_tmpf"; _tmpd=""; _tmpf=""
+}
+
+# ── Кэш: мгновенно, обновление в фоне ────────────────────────────────────────
+list_dir() {
+  local dir="$1"
+  local ckey="${dir//\//_}"
+  local cfile="$CACHE_DIR/$ckey"
+
+  if [[ -f "$cfile" ]]; then
+    cat "$cfile"
+    local dir_mtime cache_mtime now
+    printf -v now '%(%s)T' -1
+    cache_mtime="$(stat -c %Y "$cfile" 2>/dev/null)" || cache_mtime=0
+    dir_mtime="$(stat -c %Y "$dir" 2>/dev/null)" || dir_mtime=0
+    local age=$(( now - cache_mtime ))
+    if (( age >= CACHE_TTL )) || (( cache_mtime < dir_mtime )); then
+      ( build_list "$dir" > "$cfile" ) &
+    fi
+  else
+    build_list_shallow "$dir"
+    ( build_list "$dir" > "$cfile" ) &
+  fi
+}
+
+# ── Открытие ──────────────────────────────────────────────────────────────────
+open_file() {
+  local file="$1"
+  [[ ! -f "$file" ]] && return 1
+  if [[ "$file" =~ \.($TEXT_EXT)$ ]]; then
+    setsid "$TERMINAL" -e "$EDITOR_CMD" "$file" </dev/null >/dev/null 2>&1 &
+  else
+    setsid xdg-open "$file" </dev/null >/dev/null 2>&1 &
+  fi
+}
+
+open_manager() {
+  local sel="$1"
+  if [[ -f "$sel" ]]; then
+    local d="${sel%/*}"; [[ -z "$d" ]] && d="/"
+    setsid xdg-open "$d" </dev/null >/dev/null 2>&1 &
+  elif [[ -d "$sel" ]]; then
+    setsid xdg-open "$sel" </dev/null >/dev/null 2>&1 &
+  fi
+}
+
+# ── Режим принудительной сборки кэша (для warmup) ─────────────────────────────
+if [[ "$1" == "--build-cache" ]]; then
+  ckey="${START_DIR//\//_}"
+  cfile="$CACHE_DIR/$ckey"
+  build_list "$START_DIR" > "$cfile"
+  exit 0
+fi
+
+# ── Парсинг состояния ─────────────────────────────────────────────────────────
+PREVIEW_FILE=""
+if [[ "$ROFI_DATA" == "PREVIEW:"* ]]; then
+  _tmp="${ROFI_DATA#PREVIEW:}"
+  PREVIEW_FILE="${_tmp%%::*}"
+  DIR="${_tmp##*::}"
+else
+  DIR="${ROFI_DATA:-$START_DIR}"
+fi
+[[ ! -d "$DIR" ]] && DIR="$START_DIR"
+
+RAW="$1"
+if [[ "$RAW" == '─────────────────────────────' ]]; then
+  print_directives "$DIR" "$DIR"
+  list_dir "$DIR"
+  exit 0
+fi
+[[ "$RAW" == *$'\t'* ]] && SELECTED="${RAW##*$'\t'}" || SELECTED="$RAW"
+
+# ── Основная логика ───────────────────────────────────────────────────────────
+case "$ROFI_RETV" in
+0)
+  print_directives "$DIR" "$DIR"
+  list_dir "$DIR"
+  ;;
+1)
+  if [[ -z "$SELECTED" || "$SELECTED" == $'\t' ]]; then
+    print_directives "$DIR" "$DIR"
+    list_dir "$DIR"
+  elif [[ -d "$SELECTED" ]]; then
+    print_directives "$SELECTED" "$SELECTED"
+    printf '\x00message\x1f \n'
+    list_dir "$SELECTED"
+  elif [[ -f "$SELECTED" ]]; then
+    if [[ -n "$PREVIEW_FILE" && "$PREVIEW_FILE" == "$SELECTED" ]]; then
+      open_file "$SELECTED"
+      print_directives "$DIR" "$DIR"
+      printf '\x00message\x1f \n'
+      list_dir "$DIR"
+    else
+      print_directives "$DIR" "PREVIEW:${SELECTED}::${DIR}"
+      show_preview "$SELECTED"
+      list_dir "$DIR"
+    fi
+  else
+    print_directives "$DIR" "$DIR"
+    list_dir "$DIR"
+  fi
+  ;;
+2)
+  open_manager "$SELECTED"
+  print_directives "$DIR" "$DIR"
+  list_dir "$DIR"
+  ;;
+*)
+  print_directives "$DIR" "$DIR"
+  list_dir "$DIR"
+  ;;
+esac
+
+exit 0

@@ -1,0 +1,101 @@
+/*
+ * Tokyo Night Night - Wofi Theme
+ */
+
+* {
+  font-family: "JetBrainsMono Nerd Font", monospace;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+window {
+  background-color: #1a1b26;
+  border: 2px solid #3b4261;
+  border-radius: 12px;
+  padding: 0;
+}
+
+#input {
+  margin: 12px;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  background-color: #16161e;
+  color: #c0caf5;
+  outline: none;
+}
+
+#input:focus {
+  border: 1px solid #bb9af7;
+  background-color: #0f0f14;
+}
+
+#input image {
+  color: #565f89;
+}
+
+#inner-box {
+  margin: 0 8px 8px 8px;
+  background-color: transparent;
+}
+
+#outer-box {
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
+}
+
+#scroll {
+  margin: 0;
+  background-color: transparent;
+}
+
+scrollbar {
+  background-color: transparent;
+  border: none;
+}
+
+scrollbar slider {
+  background-color: #3b4261;
+  border-radius: 8px;
+  min-width: 6px;
+}
+
+scrollbar slider:hover {
+  background-color: #565f89;
+}
+
+#entry {
+  padding: 8px 12px;
+  margin: 2px 4px;
+  border: none;
+  border-radius: 8px;
+  background-color: transparent;
+}
+
+#entry:hover {
+  background-color: #2d3348;
+}
+
+#entry:selected {
+  background-color: #2f3349;
+  border: 1px solid #c0caf5;
+}
+
+#text {
+  margin-left: 8px;
+  color: #c0caf5;
+}
+
+#text:selected {
+  color: #c0caf5;
+  font-weight: 600;
+}
+
+#entry image {
+  margin-right: 8px;
+}
+
+#entry.no-results {
+  color: #565f89;
+}

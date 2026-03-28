@@ -1,0 +1,115 @@
+import "../themes/tokyonight-night.rasi"
+
+configuration {
+    show-icons: true;
+}
+
+window {
+    location:         center;
+    anchor:           center;
+    width:            778px;
+    border-radius:    15px;
+    background-color: @background;
+    border:           1px;
+    border-color:     @border-color;
+    cursor:           "default";
+}
+
+mainbox {
+    spacing:          8px;
+    padding:          10px;
+    background-color: transparent;
+    orientation:      vertical;
+    children:         [ "inputbar", "listview" ];
+}
+
+inputbar {
+    spacing:          6px;
+    padding:          8px;
+    border-radius:    10px;
+    background-color: @background-alt;
+    text-color:       @foreground;
+    children:         [ "textbox-prompt-colon", "entry", "case-indicator" ];
+    border:           0px;
+    expand:           false;
+}
+
+textbox-prompt-colon {
+    str:              "󰋫";
+    background-color: inherit;
+    text-color:       @accent-secondary;
+    font:             "JetBrains Mono Nerd Font Bold 10";
+    expand:           false;
+}
+
+entry {
+    background-color: inherit;
+    text-color:       inherit;
+    cursor:           text;
+    placeholder:      "Search wallpapers...";
+    placeholder-color:@foreground-dim;
+    expand:           true;
+}
+
+case-indicator {
+    background-color: transparent;
+    text-color:       @foreground-dim;
+}
+
+listview {
+    columns:          3;
+    lines:            3;
+    cycle:            false;
+    dynamic:          false;
+    scrollbar:        true;
+    layout:           vertical;
+    fixed-height:     true;
+    fixed-columns:    true;
+    spacing:          0px;
+    background-color: transparent;
+    cursor:           "default";
+    border:           0;
+}
+
+scrollbar {
+    handle-color:     @accent-primary;
+    background-color: @background-alt;
+    border-radius:    3px;
+    width:            6px;
+}
+
+element {
+    orientation:      vertical;
+    spacing:          0px;
+    padding:          0px;
+    margin:           0px;
+    border-radius:    6px;
+    background-color: transparent;
+    cursor:           pointer;
+    children:         [ element-icon ];
+}
+
+element normal.normal    { background-color: transparent; }
+element alternate.normal { background-color: transparent; }
+element selected.normal  { background-color: @background-highlight;
+                           border: 2px; border-color: @accent-primary; border-radius: 8px; }
+
+element-icon {
+    background-color: transparent;
+    size:             250px 141px;
+    squared:          false;
+    scale:            true;
+    border-radius:    6px;
+    cursor:           inherit;
+    padding:          0px;
+    margin:           0px;
+}
+
+error-message {
+    padding:          15px;
+    border-radius:    10px;
+    background-color: @background;
+    text-color:       @urgent;
+    border:           1px;
+    border-color:     @urgent;
+}

@@ -1,0 +1,125 @@
+@import "../themes/tokyonight-night.rasi"
+
+* {
+    bg:       @background;
+    fg:       @foreground;
+    iconfont: "JetBrainsMono Nerd Font 10";
+}
+
+window {
+    transparency:  "real";
+    background-image: none;
+    width:         360px;
+    border:        1px;
+    border-color:  @border-color;
+    border-radius: 10px;
+    padding:       0;
+    location:      1;
+    anchor:        1;
+    x-offset:      20px;
+    y-offset:      20px;
+}
+
+/*
+ * phys_w=358 (360 - 1px border each side), phys_h=283
+ * padding-top = 283 - message(~18px) - prompt(~18px) = 247
+ */
+inputbar {
+    children:         [ message, prompt ];
+    orientation:      vertical;
+    background-image: url("/tmp/cover.png", none);
+    background-color: transparent;
+    padding:          241px 0px 0px 0px;
+    border-radius:    10px 10px 0px 0px;
+    border:           0px;
+    margin:           0px;
+    expand:           false;
+    spacing:          0px;
+}
+
+prompt {
+    expand:           true;
+    padding:          4px 15px 6px 15px;
+    border-radius:    0px;
+    background-color: transparent;
+    background-image: none;
+    text-color:       white;
+    font:             "JetBrainsMono Nerd Font 9";
+    horizontal-align: 0;
+    vertical-align:   1;
+}
+
+message {
+    padding:           4px 15px 0px 15px;
+    border:            0px;
+    margin:            0px;
+    background-color:  transparent;
+    background-image:  none;
+    text-color:        white;
+    font:              "JetBrainsMono Nerd Font 9";
+}
+
+listview {
+    background-image:  none;
+    cycle:             true;
+    layout:            horizontal;
+    padding:           10px;
+    scrollbar:         false;
+    spacing:           0px;
+    border:            0px;
+    background-color:  @background;
+    border-radius:     0px 0px 10px 10px;
+}
+
+textbox-prompt-colon {
+    expand:            false;
+    str:               "";
+}
+
+mainbox {
+    children:          [ inputbar, listview ];
+    padding:           0;
+    margin:            0;
+    spacing:           0;
+    background-image:  none;
+    background-color:  @background;
+    border-radius:     10px;
+}
+
+element {
+    padding:        0px 10px;
+    border-radius:  8px;
+    expand:         true;
+    spacing:        0;
+    children:       [ element-text ];
+    border:         0px;
+}
+
+element-text {
+    margin:            5px 14px;
+    padding:           0;
+    border:            0;
+    font:              "JetBrainsMono Nerd Font 24";
+    background-color:  inherit;
+    text-color:        inherit;
+    expand:            true;
+    horizontal-align:  0.5;
+    vertical-align:    0.5;
+}
+
+element normal normal,
+element normal active,
+element normal urgent,
+element alternate normal,
+element alternate active,
+element alternate urgent {
+    text-color:       @foreground;
+    background-color: transparent;
+}
+
+element selected normal,
+element selected active,
+element selected urgent {
+    background-color: @foreground;
+    text-color:       @background;
+}

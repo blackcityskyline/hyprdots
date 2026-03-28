@@ -1,0 +1,66 @@
+{
+	"window-size": {
+		"width": 1156,
+		"height": 466
+	},
+	"window-maximized": false,
+	"window-position": {
+		"x": 127,
+		"y": 180
+	},
+	"url": "https://music.youtube.com/watch?v=YlvTc-EajjY&list=PLINXlJHPmWiVVgKT19muubZHyJYR21UAR&index=0",
+	"options": {
+		"tray": false,
+		"appVisible": true,
+		"autoUpdates": true,
+		"alwaysOnTop": false,
+		"hideMenu": true,
+		"hideMenuWarned": true,
+		"startAtLogin": false,
+		"disableHardwareAcceleration": false,
+		"removeUpgradeButton": false,
+		"restartOnConfigChanges": false,
+		"trayClickPlayPause": false,
+		"autoResetAppCache": false,
+		"resumeOnStart": true,
+		"likeButtons": "",
+		"proxy": "",
+		"startingPage": "Library",
+		"overrideUserAgent": false,
+		"usePodcastParticipantAsArtist": false,
+		"themes": [
+			"/home/black/.config/YouTube Music/ytmtokyonight.css"
+		],
+		"language": "ru"
+	},
+	"plugins": {
+		"notifications": {},
+		"video-toggle": {
+			"enabled": true,
+			"hideVideo": true,
+			"mode": "custom",
+			"forceHide": true,
+			"align": "left"
+		},
+		"precise-volume": {
+			"globalShortcuts": {}
+		},
+		"discord": {
+			"listenAlong": true
+		},
+		"quality-changer": {
+			"enabled": true
+		},
+		"unobtrusive-player": {
+			"enabled": true
+		},
+		"skip-disliked-songs": {
+			"enabled": true
+		}
+	},
+	"__internal__": {
+		"migrations": {
+			"version": "3.11.0"
+		}
+	}
+}

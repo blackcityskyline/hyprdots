@@ -1,0 +1,17 @@
+# Tokyo Night Moon - Menu Config for wofi-wifi and wofi-bluetooth
+# Position values:
+# 1 2 3
+# 8 0 4
+# 7 6 5
+
+# Position (top-right corner)
+POSITION=3
+
+# Y-offset (distance from top)
+YOFF=10
+
+# X-offset (distance from right edge)
+XOFF=-15
+
+# Fields to display (for WiFi menu)
+FIELDS=SSID,IN-USE,BARS,SECURITY

@@ -1,0 +1,36 @@
+# Tokyo Night Moon - Minimal Wofi Config
+
+# Window dimensions
+width=500
+height=400
+# y_offset=5
+# Position (center of screen)
+location=center
+
+# Default mode
+show=drun
+
+# Prompt text
+prompt=Search
+
+# Performance
+filter_rate=100
+
+# Features
+allow_markup=true
+no_actions=true
+allow_images=true
+image_size=32
+
+# Layout
+halign=fill
+orientation=vertical
+content_halign=fill
+
+# Behavior
+insensitive=true
+matching=fuzzy
+gtk_dark=true
+
+# Disable sorting (preserve order for custom menus)
+sort_order=default

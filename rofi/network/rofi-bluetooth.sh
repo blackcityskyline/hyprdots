@@ -1,0 +1,512 @@
+#!/usr/bin/env bash
+# Bluetooth Manager for Rofi — порт wofi-bluetooth.sh
+
+set -uo pipefail
+export LC_ALL="${LC_ALL:-C.UTF-8}"
+
+# ─── Конфиг ───────────────────────────────────────────────────────────────────
+CACHE="$HOME/.cache/bluetooth-rofi"
+RASI_THEME="$HOME/.config/rofi/network/network.rasi"
+BT_CONNECT_SCRIPT="${BT_CONNECT_SCRIPT:-$HOME/bin/others/bt_connect.sh}"
+MAX_LINES=15
+
+mkdir -p "$CACHE" || {
+  echo "ERROR: Cannot create cache directory $CACHE" >&2
+  exit 1
+}
+
+# ─── Иконки ───────────────────────────────────────────────────────────────────
+BTON="󰂯" BTOFF="󰂲" CON="✓" PAIRED="󰂱" SCAN="󰒓" TRUST="󰷖"
+REMOVE="󰆴" BACK="󰜺" EXIT="󰿅" POW="⏻" DISC="󰖪"
+AUDIO="󰋋" PHONE="󰏲" COMPUTER="󰟀" DEVICE="󰂰"
+
+# ─── Уведомления ──────────────────────────────────────────────────────────────
+notify() {
+  command -v notify-send &>/dev/null && notify-send "Bluetooth" "$1" -t "${2:-2000}" 2>/dev/null || true
+  echo "$1" >&2
+}
+die() {
+  echo "ERROR: $1" >&2
+  notify "$1" 5000
+  exit 1
+}
+
+check_deps() {
+  local missing=0
+  command -v bluetoothctl &>/dev/null || {
+    echo "ERROR: bluetoothctl not installed" >&2
+    missing=1
+  }
+  command -v rofi &>/dev/null || {
+    echo "ERROR: rofi not installed" >&2
+    missing=1
+  }
+  [[ $missing -eq 1 ]] && exit 1
+}
+
+# ─── Bluetooth хелперы ────────────────────────────────────────────────────────
+bt_power_state() { bluetoothctl show 2>/dev/null | grep -q "Powered: yes"; }
+bt_power_on() {
+  bluetoothctl power on &>/dev/null
+  sleep 1
+}
+bt_power_off() { bluetoothctl power off &>/dev/null; }
+bt_scanning() { bluetoothctl show 2>/dev/null | grep -q "Discovering: yes"; }
+
+get_device_icon() {
+  case "$1" in
+  *[Hh]eadphone* | *[Hh]eadset* | *[Ee]arbud* | *[Ss]peaker* | *[Aa]udio*) echo "$AUDIO" ;;
+  *[Pp]hone* | *[Mm]obile*) echo "$PHONE" ;;
+  *[Cc]omputer* | *[Ll]aptop* | *PC*) echo "$COMPUTER" ;;
+  *) echo "$DEVICE" ;;
+  esac
+}
+
+# ─── Меню rofi ────────────────────────────────────────────────────────────────
+_rofi_base() {
+  local prompt="$1" n="$2"
+  shift 2
+  local -a cmd=(rofi -dmenu -p "$prompt")
+  [[ -f "$RASI_THEME" ]] && cmd+=(-theme "$RASI_THEME")
+  cmd+=(-theme-str "listview { lines: ${n}; }")
+  cmd+=("$@")
+  "${cmd[@]}"
+}
+
+menu() {
+  local prompt="$1" content="$2"
+  local rendered
+  rendered=$(printf '%b' "$content")
+  local n
+  n=$(printf '%s' "$rendered" | awk 'NF' | wc -l)
+  [[ $n -lt 1 ]] && n=1
+  [[ $n -gt $MAX_LINES ]] && n=$MAX_LINES
+  printf '%s\n' "$rendered" | _rofi_base "$prompt" "$n" 2>/dev/null || true
+}
+
+menu_raw() {
+  local prompt="$1" content="$2"
+  local n
+  n=$(printf '%s' "$content" | awk 'NF' | wc -l)
+  [[ $n -lt 1 ]] && n=1
+  [[ $n -gt $MAX_LINES ]] && n=$MAX_LINES
+  printf '%s\n' "$content" | _rofi_base "$prompt" "$n" 2>/dev/null || true
+}
+
+# ─── Кеш устройств ────────────────────────────────────────────────────────────
+parse_devices() {
+  local type="$1"
+  local cache="$CACHE/bt-${type}"
+  local cache_data="$CACHE/bt-data-${type}"
+
+  # Paired кешируем дольше
+  local max_age=5
+  [[ "$type" == "paired" ]] && max_age=30
+
+  if [[ -f "$cache" && $(($(date +%s) - $(stat -c %Y "$cache" 2>/dev/null || echo 0))) -lt $max_age ]]; then
+    cat "$cache"
+    return
+  fi
+
+  >"$cache"
+  >"$cache_data"
+  local cnt=1
+
+  if [[ "$type" == "paired" ]]; then
+    while IFS= read -r line; do
+      local mac name
+      mac=$(awk '{print $2}' <<<"$line")
+      name=$(cut -d' ' -f3- <<<"$line")
+      [[ -z "$mac" || -z "$name" ]] && continue
+
+      local info icon status="" trusted=""
+      info=$(bluetoothctl info "$mac" 2>/dev/null)
+      icon=$(get_device_icon "$name")
+
+      grep -q "Connected: yes" <<<"$info" && status=" $CON"
+      grep -q "Trusted: yes" <<<"$info" && trusted=" $TRUST"
+
+      local display="$name"
+      ((${#display} > 30)) && display="${display:0:27}..."
+
+      printf '%s\n' "${icon} ${display}${status}${trusted}" >>"$cache"
+      # TAB-разделитель — безопасен для имён с |
+      printf '%s\t%s\t%s\n' "$cnt" "$mac" "$name" >>"$cache_data"
+      ((cnt++))
+    done < <(bluetoothctl devices Paired 2>/dev/null)
+
+  else
+    # Только не спаренные устройства
+    local paired_macs
+    paired_macs=$(bluetoothctl devices Paired 2>/dev/null | awk '{print $2}')
+
+    while IFS= read -r line; do
+      local mac name
+      mac=$(awk '{print $2}' <<<"$line")
+      name=$(cut -d' ' -f3- <<<"$line")
+      [[ -z "$mac" || -z "$name" ]] && continue
+      grep -qx "$mac" <<<"$paired_macs" && continue
+
+      local icon rssi=""
+      icon=$(get_device_icon "$name")
+
+      local info
+      info=$(bluetoothctl info "$mac" 2>/dev/null)
+      if grep -q "RSSI:" <<<"$info"; then
+        rssi=" [$(awk '/RSSI:/{print $2}' <<<"$info") dBm]"
+      fi
+
+      local display="$name"
+      ((${#display} > 30)) && display="${display:0:27}..."
+
+      printf '%s\n' "${icon} ${display}${rssi}" >>"$cache"
+      printf '%s\t%s\t%s\n' "$cnt" "$mac" "$name" >>"$cache_data"
+      ((cnt++))
+    done < <(bluetoothctl devices 2>/dev/null)
+  fi
+
+  [[ -s "$cache" ]] && cat "$cache" || echo "No devices found"
+}
+
+get_device_by_line() {
+  local type="$1" line_num="$2"
+  local cache_data="$CACHE/bt-data-${type}"
+  [[ -f "$cache_data" ]] || return 1
+  awk -F'\t' -v n="$line_num" '$1==n {print $2"\t"$3}' "$cache_data"
+}
+
+# ─── Сканирование ─────────────────────────────────────────────────────────────
+start_scan() {
+  notify "Scanning for devices..." 2000
+  rm -f "$CACHE/bt-scanned" "$CACHE/bt-data-scanned"
+  # Запускаем сканирование в фоне и ждём 5 секунд
+  bluetoothctl scan on &>/dev/null &
+  SCAN_PID=$!
+  sleep 5
+}
+
+stop_scan() {
+  bluetoothctl scan off &>/dev/null
+  # Убиваем фоновый процесс если жив
+  [[ -n "${SCAN_PID:-}" ]] && kill "$SCAN_PID" 2>/dev/null || true
+  SCAN_PID=""
+}
+
+# ─── Операции с устройствами ──────────────────────────────────────────────────
+pair_device() {
+  local mac="$1" name="$2"
+  notify "Pairing with $name..." 2000
+  local result
+  result=$(timeout 30 bluetoothctl pair "$mac" 2>&1) || true
+  if grep -qi "successful\|paired" <<<"$result"; then
+    bluetoothctl trust "$mac" &>/dev/null || true
+    notify "Paired with $name" 2000
+    return 0
+  fi
+  notify "Failed to pair with $name" 3000
+  return 1
+}
+
+connect_device() {
+  local mac="$1" name="$2"
+  notify "Connecting to $name..." 2000
+  local result
+  result=$(timeout 30 bluetoothctl connect "$mac" 2>&1) || true
+  if grep -qi "successful\|connected" <<<"$result"; then
+    notify "Connected to $name" 2000
+    return 0
+  fi
+  notify "Failed to connect to $name" 3000
+  return 1
+}
+
+disconnect_device() {
+  local mac="$1" name="$2"
+  notify "Disconnecting from $name..." 1500
+  if bluetoothctl disconnect "$mac" &>/dev/null; then
+    notify "Disconnected from $name" 2000
+    return 0
+  fi
+  notify "Failed to disconnect from $name" 3000
+  return 1
+}
+
+trust_device() {
+  local mac="$1" name="$2"
+  bluetoothctl trust "$mac" &>/dev/null && notify "$name is now trusted" 2000 || notify "Failed to trust $name" 2000
+}
+untrust_device() {
+  local mac="$1" name="$2"
+  bluetoothctl untrust "$mac" &>/dev/null && notify "$name is no longer trusted" 2000 || notify "Failed to untrust $name" 2000
+}
+remove_device() {
+  local mac="$1" name="$2"
+  bluetoothctl remove "$mac" &>/dev/null && notify "Removed $name" 2000 || notify "Failed to remove $name" 2000
+}
+
+disconnect_all() {
+  notify "Disconnecting all..." 1500
+  local count=0
+  while IFS= read -r line; do
+    [[ -z "$line" ]] && continue
+    local mac
+    mac=$(awk '{print $2}' <<<"$line")
+    [[ -z "$mac" ]] && continue
+    local info
+    info=$(bluetoothctl info "$mac" 2>/dev/null)
+    if grep -q "Connected: yes" <<<"$info"; then
+      bluetoothctl disconnect "$mac" &>/dev/null && ((count++)) || true
+    fi
+  done < <(bluetoothctl devices Paired 2>/dev/null)
+  [[ $count -gt 0 ]] && notify "Disconnected $count device(s)" 2000 || notify "No connected devices" 2000
+}
+
+# ─── Главное меню ─────────────────────────────────────────────────────────────
+main_menu() {
+  local items=""
+
+  if bt_power_state; then
+    items+="󰆻 Run fast connect script\n"
+    items+="$SCAN Scan for devices\n"
+    items+="$PAIRED Paired devices\n"
+    items+="$DISC Disconnect all\n"
+    items+="$POW Turn off Bluetooth\n"
+    items+="$BTON Bluetooth is ON\n"
+    items+="$EXIT Exit"
+  else
+    items+="$POW Turn on Bluetooth\n"
+    items+="$BTOFF Bluetooth is OFF\n"
+    items+="$EXIT Exit"
+  fi
+
+  local ch
+  ch=$(menu "Bluetooth:" "$items")
+  [[ -z "$ch" ]] && exit 0
+
+  case "$ch" in
+  *"Exit"*) exit 0 ;;
+  *"Turn off Bluetooth"*)
+    bt_power_off
+    notify "Bluetooth off" 2000
+    exec "$0"
+    ;;
+  *"Turn on Bluetooth"*)
+    bt_power_on
+    notify "Bluetooth on" 2000
+    exec "$0"
+    ;;
+  *"Disconnect all"*)
+    disconnect_all
+    sleep 1
+    exec "$0"
+    ;;
+  *"Scan for devices"*)
+    scan_menu
+    return 0
+    ;;
+  *"Paired devices"*)
+    paired_menu
+    return 0
+    ;;
+  *"Run fast connect"*)
+    if [[ -x "$BT_CONNECT_SCRIPT" ]]; then
+      notify "Running fast connect..." 2000
+      "$BT_CONNECT_SCRIPT" &
+      sleep 1
+      exec "$0"
+    else
+      notify "Script not found: $BT_CONNECT_SCRIPT" 3000
+      exec "$0"
+    fi
+    ;;
+  *"Bluetooth is"*) exec "$0" ;;
+  esac
+  exec "$0"
+}
+
+# ─── Меню сканирования ────────────────────────────────────────────────────────
+scan_menu() {
+  start_scan
+
+  local devices
+  devices=$(parse_devices "scanned")
+
+  local items=""
+  items+="$BACK Back"
+  items+=$'\n'"$SCAN Rescan"
+  items+=$'\n'"$EXIT Exit"
+
+  local cnt=1
+  while IFS= read -r line; do
+    [[ "$line" == "No devices found" ]] && continue
+    items+=$'\n'"${cnt}. ${line}"
+    ((cnt++))
+  done <<<"$devices"
+
+  local ch
+  ch=$(menu_raw "New devices:" "$items")
+
+  case "$ch" in
+  "" | *"Exit"*)
+    stop_scan
+    exit 0
+    ;;
+  *"Back"*)
+    stop_scan
+    exec "$0"
+    ;;
+  *"Rescan"*)
+    stop_scan
+    rm -f "$CACHE/bt-scanned" "$CACHE/bt-data-scanned"
+    scan_menu
+    return 0
+    ;;
+  esac
+
+  if [[ "$ch" =~ ^([0-9]+)\. ]]; then
+    local num="${BASH_REMATCH[1]}" device_info mac name
+    device_info=$(get_device_by_line "scanned" "$num")
+    mac="${device_info%%$'\t'*}"
+    name="${device_info#*$'\t'}"
+    stop_scan
+
+    if [[ -z "$mac" ]]; then
+      notify "Failed to get device info" 2000
+      exec "$0"
+    fi
+
+    if pair_device "$mac" "$name"; then
+      sleep 1
+      connect_device "$mac" "$name"
+    fi
+    sleep 1
+    exec "$0"
+  fi
+
+  stop_scan
+  exec "$0"
+}
+
+# ─── Меню спаренных устройств ─────────────────────────────────────────────────
+paired_menu() {
+  local devices
+  devices=$(parse_devices "paired")
+
+  local items=""
+  items+="$BACK Back"
+  items+=$'\n'"$SCAN Refresh"
+  items+=$'\n'"$EXIT Exit"
+
+  local cnt=1
+  while IFS= read -r line; do
+    [[ "$line" == "No devices found" ]] && continue
+    items+=$'\n'"${cnt}. ${line}"
+    ((cnt++))
+  done <<<"$devices"
+
+  local ch
+  ch=$(menu_raw "Paired devices:" "$items")
+  [[ -z "$ch" ]] && exit 0
+
+  case "$ch" in
+  *"Exit"*) exit 0 ;;
+  *"Back"*) exec "$0" ;;
+  *"Refresh"*)
+    rm -f "$CACHE/bt-paired" "$CACHE/bt-data-paired"
+    paired_menu
+    return 0
+    ;;
+  esac
+
+  if [[ "$ch" =~ ^([0-9]+)\. ]]; then
+    local num="${BASH_REMATCH[1]}" device_info mac name
+    device_info=$(get_device_by_line "paired" "$num")
+    mac="${device_info%%$'\t'*}"
+    name="${device_info#*$'\t'}"
+
+    if [[ -z "$mac" ]]; then
+      notify "Failed to get device info" 2000
+      exec "$0"
+    fi
+
+    device_actions_menu "$mac" "$name"
+    return 0
+  fi
+
+  exec "$0"
+}
+
+# ─── Меню действий с устройством ──────────────────────────────────────────────
+device_actions_menu() {
+  local mac="$1" name="$2"
+
+  local info
+  info=$(bluetoothctl info "$mac" 2>/dev/null)
+  local is_connected=false is_trusted=false
+  grep -q "Connected: yes" <<<"$info" && is_connected=true
+  grep -q "Trusted: yes" <<<"$info" && is_trusted=true
+
+  local items=""
+  items+="$BACK Back"
+  items+=$'\n'
+
+  $is_connected && items+="$DISC Disconnect" || items+="$CON Connect"
+  items+=$'\n'
+  $is_trusted && items+="$TRUST Untrust device" || items+="$TRUST Trust device"
+  items+=$'\n'"$REMOVE Remove device"
+  items+=$'\n'"$EXIT Exit"
+
+  local ch
+  ch=$(menu_raw "Device: $name" "$items")
+  [[ -z "$ch" ]] && exec "$0"
+
+  case "$ch" in
+  *"Exit"*) exit 0 ;;
+  *"Back"*)
+    paired_menu
+    return 0
+    ;;
+  *"Connect"*)
+    connect_device "$mac" "$name"
+    sleep 1
+    device_actions_menu "$mac" "$name"
+    return 0
+    ;;
+  *"Disconnect"*)
+    disconnect_device "$mac" "$name"
+    sleep 1
+    device_actions_menu "$mac" "$name"
+    return 0
+    ;;
+  *"Trust"*)
+    if $is_trusted; then
+      untrust_device "$mac" "$name"
+    else
+      trust_device "$mac" "$name"
+    fi
+    sleep 1
+    device_actions_menu "$mac" "$name"
+    return 0
+    ;;
+  *"Remove"*)
+    remove_device "$mac" "$name"
+    sleep 1
+    exec "$0"
+    ;;
+  esac
+
+  exec "$0"
+}
+
+# ─── Точка входа ──────────────────────────────────────────────────────────────
+SCAN_PID=""
+
+cleanup() {
+  find "$CACHE" -name "bt-*" -mmin +10 -delete 2>/dev/null || true
+  stop_scan 2>/dev/null || true
+}
+trap cleanup EXIT
+
+check_deps
+cleanup
+main_menu

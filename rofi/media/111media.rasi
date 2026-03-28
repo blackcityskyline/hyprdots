@@ -1,0 +1,88 @@
+/* Импортируем базовую тему Tokyo Night */
+@import "../themes/tokyonight-night.rasi"
+
+* {
+    bg:       @background;
+    fg:       @foreground;
+    button:   @color4;
+    iconfont: "JetBrainsMono Nerd Font 10";
+}
+
+window {
+    transparency:  "real";
+    width:         450px;
+    height:        525px;
+    border:        0px;
+    padding:       0;
+    location:      1;
+    anchor:        1;
+    x-offset:      20px;
+    y-offset:      20px;
+}
+
+prompt {
+    padding:        15px;
+    border-radius:  10px;
+    expand:         false;
+}
+
+inputbar {
+    children:       [ prompt ];
+    background-image: url("/tmp/cover.png");
+    expand:         false;
+    border-radius:  8px 8px 0px 0px;
+    padding:        290px 15px 15px 15px;
+}
+
+listview {
+    cycle:          true;
+    layout:         horizontal;
+    padding:        10px;
+    scrollbar:      false;
+    spacing:        0px;
+    border:         0px;
+}
+
+mainbox {
+    children:       [ inputbar, listview ];
+    padding:        0;
+    spacing:        0;
+}
+
+element {
+    padding:        0px 10px;
+    border-radius:  8px;
+    expand:         true;
+    spacing:        0;
+    children:       [ element-text ];
+    border:         0px;
+}
+
+element-text {
+    margin:            5px 18px;
+    padding:           0;
+    border:            0;
+    font:              "JetBrainsMono Nerd Font 30";
+    background-color:  inherit;
+    text-color:        inherit;
+    expand:            true;
+    horizontal-align:  0.5;
+    vertical-align:    0.5;
+}
+
+element normal normal,
+element normal active,
+element normal urgent,
+element alternate normal,
+element alternate active,
+element alternate urgent {
+    text-color:       @foreground;
+    background-color: transparent;
+}
+
+element selected normal,
+element selected active,
+element selected urgent {
+    background-color: @foreground;
+    text-color:       @background;
+}

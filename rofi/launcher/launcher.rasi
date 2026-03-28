@@ -1,0 +1,140 @@
+/* ~/.config/rofi/config.rasi */
+@import "../themes/tokyonight-night.rasi"
+
+/*****----- Configuration -----*****/
+configuration {
+    modi:                       "drun,run,ssh";
+    show-icons:                 true;
+    display-drun:               "APPS";
+    display-run:                "RUN";
+    display-ssh:                "SSH";
+    click-to-exit:              true;
+    drun-display-format:        "{name}";
+    matching:                   "fuzzy";
+    sort:                       true;
+    sorting-method:             "fzf";
+    drun-match-fields:          "name,generic";
+    case-sensitive:             false;
+    tokenize:                   true;
+}
+
+/*****----- Main Window -----*****/
+window {
+    transparency:                "real";
+    location:                    center;
+    anchor:                      center;
+    width:                       500px;
+    border-radius:               15px;
+    background-color:            @background;
+    border:                      1px;
+    border-color:                @border-color;
+}
+
+/*****----- Main Box -----*****/
+mainbox {
+    spacing:                     10px;
+    padding:                     10px;
+    background-color:            transparent;
+    children:                    [ "inputbar", "mode-switcher", "listview" ];
+}
+
+/*****----- Inputbar -----*****/
+inputbar {
+    spacing:                     6px;
+    padding:                     8px;
+    border-radius:               10px;
+    background-color:            @background-alt;
+    text-color:                  @foreground;
+    children:                    [ "textbox-prompt-colon", "entry" ];
+}
+textbox-prompt-colon {
+    expand:                      false;
+    str:                         "";
+    background-color:            inherit;
+    text-color:                  @accent-primary;
+    font:                        "JetBrains Mono Nerd Font Bold 10";
+}
+entry {
+    background-color:            inherit;
+    text-color:                  inherit;
+    cursor:                      text;
+    placeholder:                 "Search";
+    placeholder-color:           @foreground-dim;
+    cursor-color:                @accent-secondary;
+}
+
+/*****----- Mode Switcher -----*****/
+mode-switcher {
+    spacing:                     10px;
+    background-color:            transparent;
+    expand:                      false;
+}
+button {
+    padding:                     8px;
+    border-radius:               10px;
+    background-color:            @background-alt;
+    text-color:                  @foreground-alt;
+    cursor:                      pointer;
+    border:                      0px;
+}
+button selected {
+    background-color:            @background-highlight;
+    text-color:                  @accent-primary;
+}
+
+/*****----- Listview -----*****/
+listview {
+    columns:                     1;
+    lines:                       6;
+    cycle:                       true;
+    dynamic:                     true;
+    scrollbar:                   false;
+    spacing:                     6px;
+    background-color:            transparent;
+    text-color:                  @foreground;
+    separator:                   false;
+    border:                      0px;
+}
+
+/*****----- Elements -----*****/
+element {
+    spacing:                     8px;
+    padding:                     8px;
+    border-radius:               10px;
+    background-color:            transparent;
+    text-color:                  @foreground-alt;
+    cursor:                      pointer;
+    border:                      0px;
+}
+element normal.normal,
+element alternate.normal {
+    background-color:            transparent;
+    text-color:                  @foreground-alt;
+}
+element selected.normal {
+    background-color:            @background-highlight;
+    text-color:                  @selected-text;
+}
+element normal.urgent,
+element alternate.urgent {
+    background-color:            transparent;
+    text-color:                  @urgent;
+}
+element normal.active,
+element alternate.active {
+    background-color:            transparent;
+    text-color:                  @active;
+}
+element-icon {
+    background-color:            transparent;
+    size:                        24px;
+    cursor:                      inherit;
+}
+element-text {
+    background-color:            transparent;
+    text-color:                  inherit;
+    cursor:                      inherit;
+    vertical-align:              0.5;
+    horizontal-align:            0.0;
+    highlight:                   @accent-secondary;
+}

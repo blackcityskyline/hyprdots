@@ -1,0 +1,5 @@
+set -gx SUDO_EDITOR nvim
+lutgen apply -p palette-name --output folder-name/ *.jpg *.png 
+bash -x script-name.sh 2>&1 | head -60 # check script log
+bash -x script-name 2>&1 | tail -30 # check scripts log 
+git config --global init.defaultBranch main # set main default

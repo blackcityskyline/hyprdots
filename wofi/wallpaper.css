@@ -1,0 +1,78 @@
+/* Wofi Wallpaper Picker */
+
+* {
+  font-family: "JetBrainsMono Nerd Font", monospace;
+}
+
+window {
+  background-color: #1a1b26;
+  border: 2px solid #3b4261;
+  border-radius: 12px;
+}
+
+#input {
+  margin: 8px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  background-color: #16161e;
+  color: #c0caf5;
+}
+
+#input:focus {
+  border: 1px solid #bb9af7;
+}
+
+#outer-box {
+  margin: 0;
+  padding: 0;
+}
+
+#inner-box {
+  margin: 4px;
+}
+
+#scroll {
+  margin: 0;
+}
+
+#entry {
+  padding: 3px;
+  margin: 2px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-color: transparent;
+}
+
+#entry:hover {
+  background-color: #2d3348;
+}
+
+#entry:selected {
+  border: 2px solid #c0caf5;
+  background-color: #2f3349;
+}
+
+#text {
+  font-size: 0;
+  min-width: 0;
+  max-width: 0;
+  min-height: 0;
+  max-height: 0;
+  -gtk-min-label-chars: 0;
+  margin: 0;
+  padding: 0;
+  color: transparent;
+  border: none;
+}
+
+#img {
+  margin: 0;
+  padding: 0;
+  border-radius: 6px;
+}
+
+image {
+  margin: 0;
+  padding: 0;
+}

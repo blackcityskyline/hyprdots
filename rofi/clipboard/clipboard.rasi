@@ -1,0 +1,142 @@
+/* ~/.config/rofi/clipboard/clipboard.rasi */
+/* Shift+Left / Shift+Right — переключение между CLIPBOARD и SNIPPETS */
+/* ctrl+d  — удалить элемент (clipboard) / сниппет                    */
+/* ctrl+e  — открыть snippets.txt в редакторе (только в snippets)     */
+@import "../themes/tokyonight-night.rasi"
+
+configuration {
+    modi:              "clipboard:~/.config/rofi/clipboard/rofi-clipboard-mode.sh,snippets:~/.config/rofi/clipboard/rofi-snippets-mode.sh";
+    show-icons:        false;
+    display-clipboard: "  CLIPBOARD";
+    display-snippets:  "  SNIPPETS";
+
+    matching:          "fuzzy";
+    case-sensitive:    false;
+    no-custom:         false;
+
+    // kb-custom-1:       "ctrl+d";   /* удалить элемент */
+    // kb-custom-2:       "ctrl+e";   /* открыть редактор (snippets) */
+}
+
+/*****----- Main Window -----*****/
+window {
+    width:             550px;
+    border-radius:     12px;
+    background-color:  @background;
+    border:            1px;
+    border-color:      @border-color;
+    cursor:            "default";
+    location:          center;
+    anchor:            center;
+}
+
+/*****----- Main Box -----*****/
+mainbox {
+    spacing:           6px;
+    padding:           6px;
+    background-color:  transparent;
+    orientation:       vertical;
+    children:          [ "mode-switcher", "inputbar", "listview" ];
+}
+
+/*****----- Mode Switcher (вкладки) -----*****/
+mode-switcher {
+    enabled:           true;
+    spacing:           6px;
+    background-color:  transparent;
+    expand:            false;
+    border:            0;
+}
+
+button {
+    padding:           7px 12px;
+    border-radius:     8px;
+    background-color:  @background-alt;
+    text-color:        @foreground-alt;
+    cursor:            pointer;
+    border:            0px;
+    font:              "JetBrains Mono Nerd Font Bold 9";
+}
+
+button selected {
+    background-color:  @background-highlight;
+    text-color:        @accent-primary;
+}
+
+/*****----- Inputbar -----*****/
+inputbar {
+    spacing:           6px;
+    padding:           8px;
+    border-radius:     10px;
+    background-color:  @background-alt;
+    text-color:        @foreground;
+    children:          [ "textbox-prompt-colon", "entry" ];
+    border:            0px;
+    expand:            false;
+}
+
+textbox-prompt-colon {
+    expand:            false;
+    str:               "";
+    background-color:  inherit;
+    text-color:        @accent-secondary;
+    font:              "JetBrains Mono Nerd Font Bold 10";
+}
+
+entry {
+    background-color:  inherit;
+    text-color:        inherit;
+    cursor:            text;
+    placeholder:       "Search...";
+    placeholder-color: @foreground-dim;
+    expand:            true;
+}
+
+/*****----- Listview -----*****/
+listview {
+    columns:           1;
+    lines:             10;
+    cycle:             true;
+    dynamic:           true;
+    scrollbar:         false;
+    layout:            vertical;
+    fixed-height:      false;
+    spacing:           0px;
+    background-color:  transparent;
+    cursor:            "default";
+    border:            0;
+}
+
+/*****----- Elements -----*****/
+element {
+    orientation:       horizontal;
+    spacing:           0px;
+    padding:           5px 10px;
+    border-radius:     8px;
+    background-color:  transparent;
+    text-color:        @foreground-alt;
+    cursor:            pointer;
+    children:          [ "element-text" ];
+}
+
+element-text {
+    background-color:  transparent;
+    text-color:        inherit;
+    cursor:            inherit;
+    vertical-align:    0.5;
+    horizontal-align:  0.0;
+    font:              "JetBrains Mono Nerd Font 9";
+}
+
+element normal.normal    { background-color: transparent;           text-color: @foreground-alt; }
+element alternate.normal { background-color: transparent;           text-color: @foreground-alt; }
+element selected.normal  { background-color: @background-highlight; text-color: @selected-text;  }
+
+error-message {
+    padding:           15px;
+    border-radius:     10px;
+    background-color:  @background;
+    text-color:        @urgent;
+    border:            1px;
+    border-color:      @urgent;
+}

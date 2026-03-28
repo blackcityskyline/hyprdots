@@ -1,0 +1,551 @@
+/* Tokyo Night для YouTube Music - Правильно оптимизированная версия */
+
+:root {
+  /* === Tokyo Night — палитра синхронизирована с Waybar (style.css) === */
+
+  /* Фоны
+     --bg       = waybar window bg (#1a1b26)
+     --bg-dark  = waybar modules bg (rgba(22,23,30) = #16171e)         */
+  --bg:         #1a1b26;  /* bg            */
+  --bg-dark:    #16171e;  /* bg_dark       — модули, плеер, nav-bar    */
+  --bg-light:   #24283b;  /* bg_statusline — сайдбар, панели           */
+  --bg-card:    #292e42;  /* bg_highlight  — карточки                  */
+  --bg-visual:  #283457;  /* bg_visual     — выбранный элемент         */
+
+  /* Текст */
+  --text:       #c0caf5;  /* fg            */
+  --text-dim:   #a9b1d6;  /* fg_dark       */
+  --text-muted: #565f89;  /* comment       — waybar muted/disabled     */
+
+  /* Акценты (все совпадают с waybar) */
+  --accent:     #7aa2f7;  /* blue          */
+  --accent2:    #bb9af7;  /* magenta       */
+  --green:      #9ece6a;  /* green         — waybar bluetooth.connected */
+  --teal:       #73daca;  /* teal          */
+  --cyan:       #7dcfff;  /* cyan          — waybar hover/active text  */
+  --orange:     #e0af68;  /* orange        — waybar power balanced      */
+  --red:        #f7768e;  /* red           — waybar powermenu/critical  */
+
+  /* Границы
+     --border      = тонкие разделители внутри интерфейса
+     --border-card = #414868 совпадает с waybar tooltip border          */
+  --border:      #414868; /* = waybar tooltip border / terminal_black   */
+  --border-card: #414868; /* hover-рамки карточек                       */
+
+  /* Hover/active alpha — синхронизировано с waybar (0.2 / 0.15) */
+  --hover-bg:   rgba(122, 162, 247, 0.2);   /* waybar module hover     */
+  --active-bg:  rgba(122, 162, 247, 0.15);  /* waybar workspace active */
+}
+
+/* ПЕРЕОПРЕДЕЛЕНИЕ СТАНДАРТНЫХ ПЕРЕМЕННЫХ YT MUSIC */
+:root {
+  /* Фоны */
+  --ytmusic-general-background-a: var(--bg) !important;
+  --ytmusic-general-background-b: var(--bg) !important;
+  --ytmusic-general-background-c: var(--bg) !important;
+  --ytmusic-background: var(--bg) !important;
+  --ytmusic-brand-background-solid: var(--bg-light) !important;
+
+  /* Текст */
+  --ytmusic-text-primary: var(--text) !important;
+  --ytmusic-text-secondary: var(--text-dim) !important;
+
+  /* Плеер */
+  --ytmusic-player-bar-background: var(--bg-dark) !important;
+  --ytmusic-player-page-background: var(--bg) !important;
+
+  /* Навигация */
+  --ytmusic-nav-bar: var(--bg-light) !important;
+
+  /* YT Spec */
+  --yt-spec-general-background-a: var(--bg) !important;
+  --yt-spec-general-background-b: var(--bg) !important;
+  --yt-spec-general-background-c: var(--bg) !important;
+  --yt-spec-brand-background-solid: var(--bg-light) !important;
+  --yt-spec-base-background: var(--bg) !important;
+  --yt-spec-raised-background: var(--bg-light) !important;
+  --yt-spec-menu-background: var(--bg-light) !important;
+  --yt-spec-text-primary: var(--text) !important;
+  --yt-spec-text-secondary: var(--text-dim) !important;
+
+  /* Акцент */
+  --ytmusic-call-to-action: var(--accent) !important;
+  --ytmusic-themed-blue: var(--accent) !important;
+  --ytmusic-focus-active: var(--accent) !important;
+  --yt-spec-call-to-action: var(--accent) !important;
+  --yt-spec-brand-link-text: var(--accent) !important;
+
+  /* Границы */
+  --ytmusic-divider: var(--border) !important;
+  --yt-spec-outline: var(--border) !important;
+}
+
+/* ===== ТОЛЬКО КРИТИЧЕСКИЕ ОПТИМИЗАЦИИ ===== */
+/* 1. УБИРАЕМ САМЫЙ ТЯЖЁЛЫЙ ЭФФЕКТ - backdrop-filter */
+#nav-bar-background {
+  backdrop-filter: none !important;
+  background: var(--bg-dark) !important;
+}
+
+/* 2. УБИРАЕМ transform НА КАРТОЧКАХ (GPU acceleration) */
+ytmusic-card:hover,
+ytmusic-two-row-item-renderer:hover {
+  transform: none !important;
+  border-color: var(--accent) !important;
+}
+
+/* 3. НЕ ТРОГАЕМ transition! Оставляем как есть. */
+/* transition: none даёт обратный эффект - браузер чаще пересчитывает стили */
+
+/* ===== ОСНОВНЫЕ СТИЛИ (оригинальные) ===== */
+/* Фон */
+ytmusic-app {
+  background: var(--bg) !important;
+  color: var(--text) !important;
+}
+
+/* Боковая панель */
+#guide-content {
+  background: var(--bg-light) !important;
+  border-right: 1px solid var(--border) !important;
+}
+
+/* Элементы меню */
+ytmusic-guide-entry-renderer {
+  color: var(--text) !important;
+  border-radius: 6px !important;
+  margin: 4px 8px !important;
+}
+
+ytmusic-guide-entry-renderer:hover {
+  background: var(--hover-bg) !important;
+  border-radius: 6px !important;
+}
+
+ytmusic-guide-entry-renderer[active] {
+  background: var(--active-bg) !important;
+  color: var(--accent) !important;
+}
+
+/* Верхняя панель */
+#nav-bar-background {
+  /* backdrop-filter уже убран выше */
+  border-bottom: 1px solid var(--border) !important;
+}
+
+/* Поиск */
+ytmusic-search-box {
+  background: var(--bg-light) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  color: var(--text) !important;
+}
+
+/* Карточки — без постоянной рамки, только hover */
+ytmusic-card,
+ytmusic-two-row-item-renderer,
+ytmusic-responsive-list-item-renderer {
+  background: transparent !important;
+  border-radius: 8px !important;
+  border: 1px solid transparent !important;
+  box-shadow: none !important;
+}
+
+ytmusic-card:hover,
+ytmusic-two-row-item-renderer:hover,
+ytmusic-responsive-list-item-renderer:hover {
+  background: var(--hover-bg) !important;
+  border-color: var(--border-card) !important;
+  /* transform убран выше */
+}
+
+/* Плеер */
+ytmusic-player-bar {
+  background: var(--bg-dark) !important;
+  border-top: 1px solid var(--border) !important;
+}
+
+#progress-bar {
+  --paper-progress-active-color: var(--accent) !important;
+}
+
+/* Кнопки плеера */
+#play-pause-button:hover,
+#next-button:hover,
+#previous-button:hover {
+  color: var(--accent) !important;
+}
+
+/* Треки в списке — без постоянного фона, только hover */
+ytmusic-playlist-item,
+ytmusic-responsive-list-item-renderer,
+ytd-playlist-panel-video-renderer {
+  background: transparent !important;
+  border: none !important;
+}
+
+ytmusic-playlist-item:hover,
+ytd-playlist-panel-video-renderer:hover {
+  background: var(--hover-bg) !important;
+  border-radius: 6px !important;
+}
+
+ytmusic-playlist-item[selected],
+ytmusic-playlist-item[selected] * {
+  background: var(--bg-visual) !important;
+  color: var(--accent) !important;
+  border-radius: 6px !important;
+}
+
+/* Кнопки — не трогаем нативную pill-форму, только цвет текста.
+   border/outline не переопределяем — браузер сам рисует pill. */
+paper-button,
+yt-button-renderer,
+yt-button-shape,
+ytmusic-button-renderer {
+  color: var(--text) !important;
+}
+
+/* На hover — меняем только цвет текста и border через color.
+   background не трогаем чтобы не появлялся прямоугольник. */
+paper-button:hover,
+yt-button-renderer:hover,
+ytmusic-button-renderer:hover {
+  color: var(--accent) !important;
+}
+
+/* yt-button-shape — его внутренняя кнопка несёт border-color */
+yt-button-shape > button,
+yt-button-shape > a {
+  color: var(--text) !important;
+  border-color: var(--border-card) !important;
+}
+
+yt-button-shape:hover > button,
+yt-button-shape:hover > a {
+  color: var(--accent) !important;
+  border-color: var(--accent) !important;
+  background: transparent !important;
+}
+
+/* Убираем только браузерный outline при фокусе (синяя рамка) */
+paper-button:focus-visible,
+yt-button-shape:focus-visible,
+yt-button-shape > button:focus-visible,
+yt-button-shape > a:focus-visible {
+  outline: none !important;
+}
+
+/* Меню */
+paper-listbox {
+  background: var(--bg-light) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+}
+
+/* ===== ДОПОЛНИТЕЛЬНЫЕ ФИКСЫ ===== */
+/* Фоны для Home и плеера */
+ytmusic-browse-response,
+#page-container.ytmusic-browse-response,
+ytmusic-player-page {
+  background-color: var(--bg) !important;
+}
+
+/* Очередь треков */
+ytmusic-player-queue,
+#queue.ytmusic-player-queue {
+  background-color: var(--bg-light) !important;
+}
+
+/* ===== ФИКС 1: Чёрная панель вкладок Library/Uploads при скролле ===== */
+/*
+   "Library" / "Uploads" — это вкладки (pivot/tab bar), которые прилипают
+   к верху при скролле. Браузер создаёт новый stacking context и фон
+   пробивается чёрным окном Electron. Решение: явный фон на всё возможное.
+*/
+
+/* Pivot-бар с вкладками Library / Uploads / и т.д. */
+ytmusic-pivot-bar-renderer,
+ytmusic-pivot-bar-item-renderer,
+ytmusic-page-navigation-header-renderer,
+ytmusic-tabbed-search-results-header-renderer,
+ytmusic-library-filter-chip-bar-renderer,
+ytmusic-chip-cloud-renderer,
+ytmusic-tabs,
+ytmusic-section-list-renderer > #header,
+ytmusic-section-list-renderer > #subheader {
+  background: var(--bg) !important;
+  background-color: var(--bg) !important;
+}
+
+/* Универсальный перехват ЛЮБОГО sticky-элемента —
+   именно в moment прилипания фон становится чёрным */
+[sticky],
+[is-sticky],
+.sticky {
+  background: var(--bg) !important;
+  background-color: var(--bg) !important;
+}
+
+/* Внутренний #header на страницах с вкладками */
+ytmusic-library-page #header,
+ytmusic-library-page #title,
+ytmusic-library-page ytmusic-pivot-bar-renderer,
+ytmusic-browse-response #header,
+ytmusic-browse-response ytmusic-pivot-bar-renderer {
+  background: var(--bg) !important;
+  background-color: var(--bg) !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+/* ===== ФИКС 2: Обрезание кнопок в свёрнутой боковой панели ===== */
+/*
+   Корень проблемы — margin: 4px 8px на ytmusic-guide-entry-renderer.
+   В мини-режиме боковая панель ~72px шириной, 8px с каждой стороны
+   оставляют 56px, но сам элемент имеет минимальную ширину больше этого
+   и вылезает за правый край.
+
+   Стратегия: глобально уменьшаем горизонтальный margin до 2px,
+   плюс дополнительно перекрываем все известные мини-режимы.
+*/
+
+/* Исправляем оригинальный margin — заменяем на меньший */
+ytmusic-guide-entry-renderer {
+  margin: 4px 2px !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  max-width: 100% !important;
+}
+
+/* Страховка для мини-гайда через любые возможные атрибуты/классы */
+ytmusic-app[guide-type="YTMUSIC_MINI_GUIDE"] ytmusic-guide-entry-renderer,
+ytmusic-app[mini-guide-visible] ytmusic-guide-entry-renderer,
+ytmusic-app[mini] ytmusic-guide-entry-renderer,
+#mini-guide ytmusic-guide-entry-renderer,
+ytmusic-mini-guide ytmusic-guide-entry-renderer,
+ytmusic-mini-guide-entry-renderer {
+  margin: 4px 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+ytmusic-mini-guide-entry-renderer:hover {
+  background: var(--hover-bg) !important;
+  border-radius: 6px !important;
+}
+
+ytmusic-mini-guide-entry-renderer[active] {
+  background: var(--active-bg) !important;
+  color: var(--accent) !important;
+  border-radius: 6px !important;
+}
+
+/* Контейнер боковой панели — запрещаем выход за границы */
+#guide-content,
+ytmusic-guide,
+ytmusic-mini-guide {
+  overflow-x: hidden !important;
+}
+
+/* ===== ФИКС 3: Полосатый фон на странице Home ===== */
+/*
+   YTM чередует фон секций: чётные светлее, нечётные темнее (или наоборот).
+   Перекрываем все возможные контейнеры секций единым цветом --bg.
+*/
+
+/* Основные секции-полки */
+ytmusic-shelf-renderer,
+ytmusic-carousel-shelf-renderer,
+ytmusic-immersive-header-renderer,
+ytmusic-responsive-list-item-renderer,
+ytmusic-section-list-renderer,
+ytmusic-section-list-renderer > #contents,
+ytmusic-section-list-renderer > #contents > *,
+ytmusic-browse-response > #contents,
+ytmusic-browse-response > #contents > * {
+  background: var(--bg) !important;
+  background-color: var(--bg) !important;
+}
+
+/* Чередующиеся :nth-child фоны которые YTM ставит сам */
+ytmusic-shelf-renderer:nth-child(odd),
+ytmusic-shelf-renderer:nth-child(even),
+ytmusic-carousel-shelf-renderer:nth-child(odd),
+ytmusic-carousel-shelf-renderer:nth-child(even) {
+  background: var(--bg) !important;
+  background-color: var(--bg) !important;
+}
+
+/* Внутренние обёртки */
+ytmusic-shelf-renderer #contents,
+ytmusic-carousel-shelf-renderer #contents,
+ytmusic-shelf-renderer > .content,
+ytmusic-carousel-shelf-renderer > .content,
+#contents.ytmusic-section-list-renderer,
+#contents.ytmusic-browse-response {
+  background: var(--bg) !important;
+  background-color: var(--bg) !important;
+}
+
+/* Заголовки секций — у них тоже бывает свой фон */
+ytmusic-shelf-renderer ytmusic-header-renderer,
+ytmusic-carousel-shelf-renderer ytmusic-header-renderer,
+ytmusic-shelf-renderer #header,
+ytmusic-carousel-shelf-renderer #header {
+  background: var(--bg) !important;
+  background-color: var(--bg) !important;
+}
+
+/* ===== ФИКС 3.1: Элементы внутри шелфов — без постоянных рамок ===== */
+ytmusic-shelf-renderer ytmusic-two-row-item-renderer,
+ytmusic-carousel-shelf-renderer ytmusic-two-row-item-renderer,
+ytmusic-shelf-renderer ytmusic-responsive-list-item-renderer,
+ytmusic-carousel-shelf-renderer ytmusic-responsive-list-item-renderer,
+ytmusic-grid-renderer ytmusic-two-row-item-renderer,
+ytmusic-music-responsive-list-item-renderer {
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  box-shadow: none !important;
+}
+
+ytmusic-shelf-renderer ytmusic-two-row-item-renderer:hover,
+ytmusic-carousel-shelf-renderer ytmusic-two-row-item-renderer:hover,
+ytmusic-shelf-renderer ytmusic-responsive-list-item-renderer:hover,
+ytmusic-carousel-shelf-renderer ytmusic-responsive-list-item-renderer:hover,
+ytmusic-grid-renderer ytmusic-two-row-item-renderer:hover,
+ytmusic-music-responsive-list-item-renderer:hover {
+  background: var(--hover-bg) !important;
+  border-color: var(--border-card) !important;
+}
+
+/* ===== ФИКС 4: Чёрные рамки при скролле в самый верх Home ===== */
+/*
+   YTM активирует "immersive" режим когда страница прокручена к верху:
+   nav-bar и боковая панель перекрашиваются под цвет обложки (или в чёрный).
+   Блокируем все динамические цвета которые при этом применяются.
+*/
+
+/* Immersive-шапка — убираем её собственный фон */
+ytmusic-immersive-header-renderer,
+ytmusic-immersive-header-renderer #background,
+ytmusic-immersive-header-renderer #image-background,
+ytmusic-immersive-header-renderer #gradient-background {
+  background: var(--bg) !important;
+  background-color: var(--bg) !important;
+  background-image: none !important;
+}
+
+/* Nav-bar в immersive-режиме получает атрибут или класс от YTM */
+ytmusic-nav-bar[transparent],
+ytmusic-nav-bar[immersive],
+#nav-bar[transparent],
+#nav-bar[immersive],
+ytmusic-nav-bar.ytmusic-nav-bar,
+ytmusic-nav-bar {
+  background: var(--bg-light) !important;
+  background-color: var(--bg-light) !important;
+}
+
+/* Сам фоновый слой nav-bar в любом состоянии */
+#nav-bar-background,
+#header-container {
+  background: var(--bg-light) !important;
+  background-color: var(--bg-light) !important;
+  background-image: none !important;
+}
+
+/* Боковая панель — в immersive-режиме YTM пишет inline style напрямую.
+   Перечисляем конкретные контейнеры БЕЗ wildcard * чтобы не убивать hover. */
+ytmusic-guide,
+#guide,
+#guide-content,
+ytmusic-guide-renderer,
+ytmusic-guide #guide-inner-content,
+ytmusic-guide-renderer #guide-inner-content,
+ytmusic-guide-section-renderer,
+ytmusic-guide-section-renderer #items,
+ytmusic-guide-section-renderer #header,
+ytmusic-guide-entry-renderer #endpoint,
+ytmusic-guide-entry-renderer #title-container {
+  background: var(--bg-light) !important;
+  background-color: var(--bg-light) !important;
+  background-image: none !important;
+}
+
+ytmusic-guide,
+#guide,
+#guide-content {
+  border-right: 1px solid var(--border) !important;
+}
+
+/* ===== ПОДСВЕТКА HOVER В БОКОВОЙ ПАНЕЛИ ===== */
+/* Развёрнутый режим — обычные ссылки */
+ytmusic-guide-entry-renderer:hover {
+  background: var(--hover-bg) !important;
+  border-radius: 6px !important;
+}
+
+ytmusic-guide-entry-renderer[active] {
+  background: var(--active-bg) !important;
+  border-radius: 6px !important;
+}
+
+ytmusic-guide-entry-renderer[active],
+ytmusic-guide-entry-renderer[active] yt-formatted-string,
+ytmusic-guide-entry-renderer[active] .title {
+  color: var(--accent) !important;
+}
+
+/* Плейлисты и остальные ссылки в секции библиотеки */
+ytmusic-guide-section-renderer ytmusic-guide-entry-renderer:hover {
+  background: var(--hover-bg) !important;
+  border-radius: 6px !important;
+}
+
+/* Кнопка Create playlist — выделяем явно */
+ytmusic-guide-section-renderer ytmusic-button-renderer,
+ytmusic-guide-section-renderer paper-button,
+ytmusic-guide ytmusic-button-renderer,
+ytmusic-guide yt-button-shape,
+ytmusic-guide button.yt-button-shape {
+  background: transparent !important;
+  border: 1px solid var(--border-card) !important;
+  color: var(--text) !important;
+  border-radius: 6px !important;
+}
+
+ytmusic-guide-section-renderer ytmusic-button-renderer:hover,
+ytmusic-guide-section-renderer paper-button:hover,
+ytmusic-guide ytmusic-button-renderer:hover,
+ytmusic-guide yt-button-shape:hover,
+ytmusic-guide button.yt-button-shape:hover {
+  background: var(--active-bg) !important;
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+}
+
+/* Блокируем динамическую замену цветовых переменных темы */
+:root,
+ytmusic-app,
+#content {
+  --ytmusic-color-red1: var(--bg) !important;
+  --ytmusic-color-red2: var(--bg) !important;
+  --ytmusic-color-red3: var(--bg) !important;
+  --ytmusic-color-text1-on-red: var(--text) !important;
+  --ytmusic-color-text2-on-red: var(--text) !important;
+  --ytmusic-general-background-a: var(--bg) !important;
+  --ytmusic-general-background-b: var(--bg) !important;
+  --ytmusic-general-background-c: var(--bg) !important;
+}
+
+/* ===== ЕСЛИ ВСЁ РАВНО ГРУЗИТ - ДОБАВЬТЕ ЭТО ===== */
+/* Отключаем сложные вычисления только для слабых устройств */
+@media (max-width: 768px) {
+  ytmusic-card,
+  ytmusic-two-row-item-renderer {
+    will-change: auto !important;
+  }
+}

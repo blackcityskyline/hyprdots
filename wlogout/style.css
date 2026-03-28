@@ -1,0 +1,101 @@
+/* wlogout — Catppuccin Mocha */
+
+window {
+    font-family: "CaskaydiaCove Nerd Font", monospace;
+    background-color: transparent;
+    color: #cdd6f4;
+}
+
+box {
+    background-color: transparent;
+}
+
+button {
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 64px 64px;
+
+    border: 1px solid rgba(205, 214, 244, 0.10);
+    border-radius: 16px;
+    color: transparent;   /* скрываем пустой label */
+    text-shadow: none;
+
+    padding: 0;
+    margin: 10px;
+    min-width: 140px;
+    min-height: 140px;
+
+    background-color: rgba(30, 30, 46, 0.60);
+    box-shadow:
+        0 2px 16px rgba(0, 0, 0, 0.30),
+        inset 0 1px 0 rgba(205, 214, 244, 0.05);
+
+    transition:
+        background-color 200ms ease,
+        box-shadow       200ms ease,
+        border-color     200ms ease;
+}
+
+button:hover {
+    background-color: rgba(49, 50, 68, 0.80);
+    border-color: rgba(205, 214, 244, 0.18);
+    box-shadow:
+        0 4px 24px rgba(0, 0, 0, 0.40),
+        inset 0 1px 0 rgba(205, 214, 244, 0.10);
+}
+
+button:focus {
+    outline: none;
+}
+
+/* ── Иконки ─────────────────────────────── */
+
+#lock {
+    background-image: url("/home/black/.config/wlogout/icons/lock.png");
+}
+#lock:hover, #lock:focus {
+    background-image: url("/home/black/.config/wlogout/icons/lock.png");
+    border-color: rgba(116, 199, 236, 0.40);
+    box-shadow: 0 4px 24px rgba(116, 199, 236, 0.25),
+                inset 0 1px 0 rgba(116, 199, 236, 0.10);
+}
+
+#logout {
+    background-image: url("/home/black/.config/wlogout/icons/logout.png");
+}
+#logout:hover, #logout:focus {
+    background-image: url("/home/black/.config/wlogout/icons/logout.png");
+    border-color: rgba(166, 227, 161, 0.40);
+    box-shadow: 0 4px 24px rgba(166, 227, 161, 0.22),
+                inset 0 1px 0 rgba(166, 227, 161, 0.10);
+}
+
+#shutdown {
+    background-image: url("/home/black/.config/wlogout/icons/power.png");
+}
+#shutdown:hover, #shutdown:focus {
+    background-image: url("/home/black/.config/wlogout/icons/power.png");
+    border-color: rgba(243, 139, 168, 0.40);
+    box-shadow: 0 4px 24px rgba(243, 139, 168, 0.25),
+                inset 0 1px 0 rgba(243, 139, 168, 0.10);
+}
+
+#reboot {
+    background-image: url("/home/black/.config/wlogout/icons/restart.png");
+}
+#reboot:hover, #reboot:focus {
+    background-image: url("/home/black/.config/wlogout/icons/restart.png");
+    border-color: rgba(250, 179, 135, 0.40);
+    box-shadow: 0 4px 24px rgba(250, 179, 135, 0.22),
+                inset 0 1px 0 rgba(250, 179, 135, 0.10);
+}
+
+#suspend {
+    background-image: url("/home/black/.config/wlogout/icons/sleep.png");
+}
+#suspend:hover, #suspend:focus {
+    background-image: url("/home/black/.config/wlogout/icons/sleep.png");
+    border-color: rgba(203, 166, 247, 0.40);
+    box-shadow: 0 4px 24px rgba(203, 166, 247, 0.22),
+                inset 0 1px 0 rgba(203, 166, 247, 0.10);
+}

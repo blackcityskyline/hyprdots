@@ -1,0 +1,483 @@
+#!/usr/bin/env bash
+# WiFi Manager for Rofi — порт wofi-network.sh
+
+set -uo pipefail
+export LC_ALL="${LC_ALL:-C.UTF-8}"
+
+# ─── Конфиг ───────────────────────────────────────────────────────────────────
+CACHE="$HOME/.cache/wifi-rofi"
+RASI_THEME="$HOME/.config/rofi/network/network.rasi"
+
+# Ожидаемые интерфейсы — отображаются всегда, даже если не вставлены
+EXPECTED_WIFI=("wlan0" "wlan1")
+EXPECTED_ETH=("enp4s0f2")
+
+mkdir -p "$CACHE" || {
+  echo "ERROR: Cannot create cache directory $CACHE" >&2
+  exit 1
+}
+
+# ─── Иконки (Nerd Fonts) ──────────────────────────────────────────────────────
+WON="󰖩" WOFF="󰖪" CON="✓" SEC="󰌾" SCAN="󰚫" MAN="󰀻" BACK="󰜺" EXIT="󰿅" POW="⏻" DISC="󰖪" ETH="󰈀" ETHOFF="󰈁"
+
+# ─── Уведомления ──────────────────────────────────────────────────────────────
+notify() {
+  command -v notify-send &>/dev/null && notify-send "WiFi" "$1" -t "${2:-2000}" 2>/dev/null || true
+  echo "$1" >&2
+}
+die() {
+  echo "ERROR: $1" >&2
+  notify "$1" 5000
+  exit 1
+}
+
+check_deps() {
+  local missing=0
+  command -v nmcli &>/dev/null || {
+    echo "ERROR: nmcli is not installed" >&2
+    missing=1
+  }
+  command -v rofi &>/dev/null || {
+    echo "ERROR: rofi is not installed" >&2
+    missing=1
+  }
+  [[ $missing -eq 1 ]] && exit 1
+  return 0
+}
+
+# ─── Хелперы nmcli ────────────────────────────────────────────────────────────
+wifi_on() { nmcli -t -f WIFI g | grep -qi "enabled"; }
+wifi_ifaces() { nmcli -t -f DEVICE,TYPE d | awk -F: '$2=="wifi" && $1 !~ /^p2p-dev-/{print $1}' | sort -u; }
+eth_ifaces() { nmcli -t -f DEVICE,TYPE d | awk -F: '$2=="ethernet"{print $1}' | sort -u; }
+iface_state() { nmcli -t -f DEVICE,STATE d | awk -F: -v i="$1" '$1==i{print $2}'; }
+current_ssid() {
+  nmcli -t -f DEVICE,CONNECTION d | awk -F: -v i="$1" '$1==i{
+    gsub(/^[\047"]|[\047"]$/, "", $2); print $2
+  }'
+}
+connected_to() { [[ "$(current_ssid "$1")" == "$2" ]]; }
+
+# ─── Сканирование ─────────────────────────────────────────────────────────────
+scan() {
+  local iface="${1:-auto}"
+  local cache="$CACHE/wifi-${iface}"
+  local cache_data="$CACHE/wifi-data-${iface}"
+
+  if [[ -f "$cache" && $(($(date +%s) - $(stat -c %Y "$cache" 2>/dev/null || echo 0))) -lt 5 ]]; then
+    cat "$cache"
+    return
+  fi
+
+  local -a cmd=(nmcli --terse --fields IN-USE,SSID,BARS,SECURITY device wifi list)
+  [[ "$iface" != "auto" ]] && cmd+=(ifname "$iface")
+
+  mkdir -p "$CACHE"
+  >"$cache"
+  >"$cache_data"
+
+  local cnt=1
+  while IFS=: read -r use ssid bars sec; do
+    [[ -z "$ssid" ]] && continue
+    local s="$ssid" st=" " si=""
+    ((${#s} > 26)) && s="${s:0:23}..."
+    [[ "$use" == "*" ]] && st=" $CON"
+    [[ "$sec" != "--" && -n "$sec" ]] && si=" $SEC"
+    printf '%s\n' "[${iface}] ${bars} ${s}${st}${si}" >>"$cache"
+    printf '%s\t%s\n' "$cnt" "$ssid" >>"$cache_data"
+    ((cnt++))
+  done < <("${cmd[@]}" 2>/dev/null)
+
+  [[ -s "$cache" ]] && cat "$cache" || echo "[${iface}] No networks"
+}
+
+get_ssid_by_line() {
+  local iface="${1:-auto}" line_num="$2"
+  local cache_data="$CACHE/wifi-data-${iface}"
+  [[ -f "$cache_data" ]] || return 1
+  awk -F'\t' -v n="$line_num" '$1==n{print $2}' "$cache_data"
+}
+
+rescan() {
+  local iface="${1:-auto}"
+  rm -f "$CACHE/wifi-${iface}" "$CACHE/wifi-data-${iface}"
+  if [[ "$iface" == "auto" ]]; then
+    nmcli dev wifi rescan 2>/dev/null || true
+  else
+    nmcli dev wifi rescan ifname "$iface" 2>/dev/null || true
+  fi
+  sleep 2
+}
+
+# ─── Подключение ──────────────────────────────────────────────────────────────
+connect() {
+  local iface="$1" ssid="$2" pass="$3"
+  ssid="${ssid#"${ssid%%[![:space:]]*}"}"
+  ssid="${ssid%"${ssid##*[![:space:]]}"}"
+  notify "Connecting to $ssid..." 1500
+
+  local result exit_code
+  if [[ -n "$pass" ]]; then
+    if [[ -n "$iface" && "$iface" != "auto" ]]; then
+      result=$(nmcli device wifi connect "$ssid" password "$pass" ifname "$iface" 2>&1)
+      exit_code=$?
+    else
+      result=$(nmcli device wifi connect "$ssid" password "$pass" 2>&1)
+      exit_code=$?
+    fi
+  else
+    if [[ -n "$iface" && "$iface" != "auto" ]]; then
+      result=$(nmcli device wifi connect "$ssid" ifname "$iface" 2>&1)
+      exit_code=$?
+    else
+      result=$(nmcli device wifi connect "$ssid" 2>&1)
+      exit_code=$?
+    fi
+  fi
+
+  if [[ $exit_code -eq 0 ]]; then
+    notify "Connected to $ssid" 2000
+    return 0
+  else
+    local msg="${result##*Error:}"
+    [[ -z "$msg" ]] && msg="Connection failed"
+    notify "$msg" 3000
+    return 1
+  fi
+}
+
+disconnect() {
+  nmcli device disconnect "$1" &>/dev/null &&
+    notify "Disconnected from $1" 2000 ||
+    notify "Failed to disconnect $1" 2000
+}
+
+# ─── Меню rofi ────────────────────────────────────────────────────────────────
+MAX_LINES=15
+_rofi_base() {
+  local prompt="$1" n="$2"
+  shift 2
+  local -a cmd=(rofi -dmenu -p "$prompt")
+  [[ -f "$RASI_THEME" ]] && cmd+=(-theme "$RASI_THEME")
+  # -theme-str имеет наивысший приоритет — перебивает и конфиг и тему
+  cmd+=(-theme-str "listview { lines: ${n}; }")
+  cmd+=("$@")
+  "${cmd[@]}"
+}
+
+menu() {
+  local prompt="$1" content="$2"
+  local rendered
+  rendered=$(printf '%b' "$content")
+  local n
+  n=$(printf '%s' "$rendered" | awk 'NF' | wc -l)
+  [[ $n -lt 1 ]] && n=1
+  [[ $n -gt $MAX_LINES ]] && n=$MAX_LINES
+  printf '%s\n' "$rendered" | _rofi_base "$prompt" "$n" 2>/dev/null || true
+}
+
+menu_raw() {
+  local prompt="$1" content="$2"
+  local n
+  n=$(printf '%s' "$content" | awk 'NF' | wc -l)
+  [[ $n -lt 1 ]] && n=1
+  [[ $n -gt $MAX_LINES ]] && n=$MAX_LINES
+  printf '%s\n' "$content" | _rofi_base "$prompt" "$n" 2>/dev/null || true
+}
+
+password_menu() {
+  printf '' | _rofi_base "$1" 1 -password 2>/dev/null || true
+}
+
+# ─── Главное меню интерфейсов ─────────────────────────────────────────────────
+interface_menu() {
+  local items=""
+  # Получаем состояния всех интерфейсов одним вызовом nmcli
+  local nmcli_states
+  nmcli_states=$(nmcli -t -f DEVICE,STATE,CONNECTION d 2>/dev/null)
+
+  _iface_st() { awk -F: -v i="$1" '$1==i{print $2}' <<<"$nmcli_states"; }
+  _iface_conn() { awk -F: -v i="$1" '$1==i{print $3}' <<<"$nmcli_states"; }
+
+  # ── WiFi ──────────────────────────────────────────────────────────────────
+  if wifi_on; then
+    for i in "${EXPECTED_WIFI[@]}"; do
+      local st conn
+      st=$(_iface_st "$i")
+      conn=$(_iface_conn "$i")
+      case "$st" in
+      connected | activated) items+="[$i] $WON Connected: ${conn}\n" ;;
+      disconnected) items+="[$i] $WOFF Not connected\n" ;;
+      unavailable) items+="[$i] $WOFF No adapter\n" ;;
+      unmanaged) items+="[$i] $WOFF Unmanaged\n" ;;
+      "") items+="[$i] $WOFF Unplugged\n" ;;
+      *) items+="[$i] $WOFF ${st}\n" ;;
+      esac
+    done
+  else
+    for i in "${EXPECTED_WIFI[@]}"; do
+      items+="[$i] $WOFF WiFi disabled\n"
+    done
+  fi
+
+  # ── Ethernet ──────────────────────────────────────────────────────────────
+  for i in "${EXPECTED_ETH[@]}"; do
+    local st conn
+    st=$(_iface_st "$i")
+    conn=$(_iface_conn "$i")
+    case "$st" in
+    connected | activated) items+="[$i] $ETH Connected: ${conn:-LAN}\n" ;;
+    disconnected) items+="[$i] $ETHOFF Not connected\n" ;;
+    unavailable) items+="[$i] $ETHOFF Unplugged\n" ;;
+    unmanaged) items+="[$i] $ETHOFF Unmanaged\n" ;;
+    "") items+="[$i] $ETHOFF Unplugged\n" ;;
+    *) items+="[$i] $ETHOFF ${st}\n" ;;
+    esac
+  done
+
+  if wifi_on; then
+    items+="$POW Turn WiFi off\n"
+  else
+    items+="$POW Turn WiFi on\n"
+  fi
+  items+="$DISC Disconnect all\n$EXIT Exit"
+
+  local ch
+  ch=$(menu "Network:" "$items")
+  [[ -z "$ch" ]] && exit 0
+
+  case "$ch" in
+  *"Exit"*) exit 0 ;;
+  *"Turn WiFi off"*)
+    nmcli radio wifi off
+    notify "WiFi off" 2000
+    exec "$0"
+    ;;
+  *"Turn WiFi on"*)
+    nmcli radio wifi on
+    notify "WiFi on" 2000
+    sleep 1
+    exec "$0"
+    ;;
+  *"Disconnect all"*)
+    for i in "${all_ifaces[@]}"; do nmcli dev disconnect "$i" 2>/dev/null || true; done
+    notify "All interfaces disconnected" 2000
+    sleep 1
+    exec "$0"
+    ;;
+  esac
+
+  if [[ "$ch" =~ ^\[([^]]+)\] ]]; then
+    local iface="${BASH_REMATCH[1]}"
+    local st
+    st=$(iface_state "$iface")
+    local iface_type
+    iface_type=$(nmcli -t -f DEVICE,TYPE d | awk -F: -v i="$iface" '$1==i{print $2}')
+
+    case "$st" in
+    unmanaged)
+      notify "$iface: Unmanaged" 2000
+      exec "$0"
+      ;;
+    unavailable)
+      if [[ "$iface_type" == "ethernet" ]]; then
+        notify "$iface: Cable unplugged" 2000
+        exec "$0"
+      else
+        notify "$iface: No adapter" 2000
+        exec "$0"
+      fi
+      ;;
+    disconnected)
+      if [[ "$iface_type" == "ethernet" ]]; then
+        notify "$iface: Not connected" 2000
+        exec "$0"
+      else
+        network_menu "$iface"
+        return 0
+      fi
+      ;;
+    *)
+      if [[ "$iface_type" == "ethernet" ]]; then
+        notify "$iface: $st" 2000
+        exec "$0"
+      else
+        network_menu "$iface"
+        return 0
+      fi
+      ;;
+    esac
+  fi
+
+  exec "$0"
+}
+
+# ─── Меню сетей (с Disconnect внутри) ────────────────────────────────────────
+network_menu() {
+  local iface="${1:-auto}"
+  notify "Scanning..." 1500
+  rescan "$iface"
+  local nets
+  nets=$(scan "$iface")
+
+  local st conn
+  st=$(iface_state "$iface")
+  conn=$(current_ssid "$iface")
+
+  # Управляющие пункты
+  local items=""
+  items+="$BACK Back"
+  items+=$'\n'"$SCAN Rescan"
+  items+=$'\n'"$MAN Manual connect"
+  # Disconnect только если интерфейс подключён
+  if [[ "$st" == "connected" || "$st" == "activated" ]]; then
+    items+=$'\n'"$DISC Disconnect ${conn}"
+  fi
+  items+=$'\n'"$EXIT Exit"
+
+  # Список сетей
+  local cnt=1
+  while IFS= read -r line; do
+    items+=$'\n'"${cnt}. ${line}"
+    ((cnt++))
+  done <<<"$nets"
+
+  local ch
+  ch=$(menu_raw "[$iface] Networks:" "$items")
+  handle_network_choice "$ch" "$iface"
+}
+
+handle_network_choice() {
+  local ch="$1" iface="$2"
+  [[ -z "$ch" ]] && exit 0
+
+  case "$ch" in
+  *"Exit"*) exit 0 ;;
+  *"Back"*) exec "$0" ;;
+  *"Rescan"*)
+    rm -f "$CACHE/wifi-$iface" "$CACHE/wifi-data-$iface"
+    notify "Scanning..." 1500
+    sleep 2
+    network_menu "$iface"
+    return 0
+    ;;
+  *"Manual connect"*)
+    manual_connect "$iface"
+    return 0
+    ;;
+  *"$DISC Disconnect"*)
+    disconnect "$iface"
+    sleep 1
+    network_menu "$iface"
+    return 0
+    ;;
+  esac
+
+  if [[ "$ch" =~ ^([0-9]+)\. ]]; then
+    local num="${BASH_REMATCH[1]}" ssid
+    ssid=$(get_ssid_by_line "$iface" "$num")
+    if [[ -z "$ssid" ]]; then
+      notify "Failed to get SSID" 2000
+      exec "$0"
+    fi
+
+    # Ищем сохранённый профиль по SSID + интерфейсу
+    # Сначала ищем профиль привязанный к конкретному интерфейсу,
+    # потом любой профиль с нужным SSID
+    local saved_profile=""
+    local fallback_profile=""
+    while IFS= read -r profile; do
+      local profile_ssid profile_iface
+      profile_ssid=$(nmcli connection show "$profile" 2>/dev/null |
+        grep "^802-11-wireless.ssid:" |
+        sed "s/^802-11-wireless\.ssid:[[:space:]]*//" |
+        tr -d "'\"")
+      profile_iface=$(nmcli connection show "$profile" 2>/dev/null |
+        grep "^connection.interface-name:" |
+        sed "s/^connection\.interface-name:[[:space:]]*//" |
+        tr -d "'\"")
+      if [[ "$profile_ssid" == "$ssid" ]]; then
+        if [[ "$profile_iface" == "$iface" ]]; then
+          # Точное совпадение: SSID + интерфейс
+          saved_profile="$profile"
+          break
+        elif [[ -z "$fallback_profile" ]]; then
+          # Запасной: только SSID совпадает
+          fallback_profile="$profile"
+        fi
+      fi
+    done < <(nmcli -t -f NAME,TYPE connection show | awk -F: '$2=="802-11-wireless"{print $1}')
+
+    # Предпочитаем точное совпадение, иначе берём запасной
+    [[ -z "$saved_profile" ]] && saved_profile="$fallback_profile"
+
+    if [[ -n "$saved_profile" ]]; then
+      # Профиль найден — подключаемся через него, keyring отдаст пароль сам
+      notify "Connecting to $ssid via $saved_profile..." 1500
+      local result exit_code
+      if [[ -n "$iface" && "$iface" != "auto" ]]; then
+        result=$(nmcli connection up "$saved_profile" ifname "$iface" 2>&1)
+        exit_code=$?
+      else
+        result=$(nmcli connection up "$saved_profile" 2>&1)
+        exit_code=$?
+      fi
+      if [[ $exit_code -ne 0 ]]; then
+        notify "Saved profile failed, re-entering password..." 2000
+        local pass
+        pass=$(password_menu "Password for $ssid:")
+        connect "$iface" "$ssid" "$pass"
+      else
+        notify "Connected to $ssid" 2000
+      fi
+    else
+      # Новая сеть — запрашиваем пароль
+      local pass
+      pass=$(password_menu "Password for $ssid:")
+      connect "$iface" "$ssid" "$pass"
+    fi
+    sleep 1
+    network_menu "$iface"
+    return 0
+  fi
+
+  exec "$0"
+}
+
+# ─── Ручное подключение ───────────────────────────────────────────────────────
+manual_menu() {
+  local items=""
+  for i in $(wifi_ifaces); do items+="[$i] Manual connect\n"; done
+  items+="$BACK Back\n$EXIT Exit"
+
+  local ch
+  ch=$(menu "Select interface for manual connection:" "$items")
+  [[ -z "$ch" ]] && exit 0
+  [[ "$ch" == *"Exit"* ]] && exit 0
+  [[ "$ch" == *"Back"* ]] && exec "$0"
+  [[ "$ch" =~ ^\[([^]]+)\] ]] && {
+    manual_connect "${BASH_REMATCH[1]}"
+    return 0
+  }
+  exec "$0"
+}
+
+manual_connect() {
+  local iface="${1:-auto}" ssid pass
+  ssid=$(menu "Enter SSID:" "")
+  [[ -z "$ssid" ]] && exec "$0"
+  pass=$(password_menu "Password for $ssid:")
+  connect "$iface" "$ssid" "$pass"
+  sleep 1
+  exec "$0"
+}
+
+# ─── Точка входа ──────────────────────────────────────────────────────────────
+cleanup() {
+  find "$CACHE" -name "wifi-*" -mmin +10 -delete 2>/dev/null || true
+  find "$CACHE" -name "wifi-data-*" -mmin +10 -delete 2>/dev/null || true
+}
+trap cleanup EXIT
+
+check_deps
+cleanup
+interface_menu
