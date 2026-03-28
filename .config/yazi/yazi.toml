@@ -1,14 +1,13 @@
 # ~/.config/yazi/yazi.toml
 
 [manager]
-show_hidden = true          # показывать скрытые файлы (начинающиеся с точки)
-show_icons = true           # отображать иконки файлов (нужен Nerd Font)
-sort_by = "natural"         # сортировка с учётом чисел (файл1, файл2, файл10)
-sort_dir_first = true       # папки всегда сверху
+show_hidden = true
+show_icons = true
+sort_by = "natural"         # sorting with numbers
+sort_dir_first = true
 
 [status]
-separator_open = ""        # красивые разделители (если шрифт поддерживает)
+separator_open = ""
 separator_close = ""
 
-# Всё остальное (preview, plugin, adapter) оставлено по умолчанию,
-# чтобы не ломать автоопределение и не вызывать предупреждений.
+# preview, plugin, adapter set by default

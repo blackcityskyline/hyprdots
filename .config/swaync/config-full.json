@@ -83,15 +83,17 @@
       "actions": [
         {
           "label": "󰖩",
-          "type": "button",
+          "type": "toggle",
           "active": true,
-          "command": "swaync-client -t -sw;sh -c 'nmgui'"
+          "command": "swaync-client -t -sw;sh -c 'nmgui'",
+          "update-command": "sh -c 'nmcli -t -f STATE general | grep -q connected && echo true || echo false'"
         },
         {
           "label": "󰖔",
           "type": "toggle",
           "active": true,
-          "command": "bash ~/.config/rofi/nightshift/rofi-nightshift.sh"
+          "command": "bash ~/.config/rofi/nightshift/rofi-nightshift.sh",
+          "update-command": "sh -c 'pgrep -x wlsunset > /dev/null && echo true || echo false'"
         },
         {
           "label": "󰅌",
@@ -114,21 +116,24 @@
         },
         {
           "label": "󰂯",
-          "type": "button",
+          "type": "toggle",
           "active": true,
-          "command": "swaync-client -t -sw;sh -c 'adw-bluetooth'"
+          "command": "swaync-client -t -sw;sh -c 'adw-bluetooth'",
+          "update-command": "sh -c 'bluetoothctl show | grep -q \"Powered: yes\" && echo true || echo false'"
         },
         {
           "label": "󰕾",
-          "type": "button",
+          "type": "toggle",
           "active": true,
-          "command": "swaync-client -t -sw;sh -c 'pavucontrol'"
+          "command": "swaync-client -t -sw;sh -c 'pavucontrol'",
+          "update-command": "sh -c 'pactl get-default-sink | grep -qiE \"usb|bluez|hdmi|headphone\" && echo true || echo false'"
         },
         {
           "label": "󰝹",
-          "type": "button",
+          "type": "toggle",
           "active": true,
-          "command": "swaync-client -t -sw;sh -c '~/bin/hypr/visuals-toggle.sh'"
+          "command": "swaync-client -t -sw;sh -c '~/bin/hypr/visuals-toggle.sh'",
+          "update-command": "sh -c '~/bin/hypr/visuals-toggle.sh --status'"
         },
         {
           "label": "󰍬",

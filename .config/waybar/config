@@ -42,7 +42,7 @@
     "interval": 1500,
     "tooltip": "App launcher",
     "on-click": "rofi -show drun -config ~/.config/rofi/launcher/launcher.rasi", // App Launcher
-    "on-click-right": "$HOME/bin/waybar/system-update.sh up", // Upgrade script
+    "on-click-right": "$HOME/bin/waybar/system-update.sh up", // Update script
   },
   
   "hyprland/workspaces": {
