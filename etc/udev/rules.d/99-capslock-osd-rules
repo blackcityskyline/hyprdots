@@ -1,2 +1,0 @@
-# /etc/udev/rules.d/99-capslock-osd.rules
-ACTION=="change", SUBSYSTEM=="leds", KERNEL=="input*::capslock", RUN+="/usr/bin/su black -c 'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus swayosd-client --caps-lock'"
