@@ -1,0 +1,4 @@
+# Внешний USB-адаптер  -> wlx_external
+SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="24:fd:52:08:37:09", NAME="wlan1"
+# Встроенный адаптер  -> wlx_internal
+SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="24:fd:52:08:37:09", NAME="wlan0"

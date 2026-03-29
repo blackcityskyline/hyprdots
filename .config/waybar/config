@@ -13,7 +13,8 @@
     "custom/arch-launcher",
     "custom/mpris-scroll",
     // "hyprland/window"
-    "custom/cpu-temp"
+    "custom/cpu-temp",
+    "hyprland/language"
   ],
   
   "modules-center": [
@@ -21,7 +22,6 @@
   ],
   
   "modules-right": [
-    "hyprland/language",
     "tray",
     // "custom/arch-update",
     "group/system",
@@ -37,12 +37,12 @@
   
   "custom/arch-launcher": {
     "format": " ",
-    "exec": "$HOME/bin/waybar/system-update.sh check",
+    "exec": "~/bin/waybar/system-update.sh check",
     "return-type": "json",
     "interval": 1500,
     "tooltip": "App launcher",
     "on-click": "rofi -show drun -config ~/.config/rofi/launcher/launcher.rasi", // App Launcher
-    "on-click-right": "$HOME/bin/waybar/system-update.sh up", // Update script
+    "on-click-right": "~/bin/waybar/system-update.sh up", // Update script
   },
   
   "hyprland/workspaces": {
@@ -87,16 +87,17 @@
     "format": "{}",
     "format-ru": "RU ",
     "format-en": "US ",
-    "on-click": "hyprctl switchxkblayout at-translated-set-2-keyboard next"
+    "on-click": "~/bin/hypr/switchxkblayout"
+    // "on-click": "hyprctl switchxkblayout at-translated-set-2-keyboard next"
   },
   
   "custom/mpris-scroll": {
     "format": "{}",
-    "exec": "$HOME/bin/waybar/mpris-scroll.sh",
+    "exec": "~/bin/waybar/mpris-scroll.sh",
     "return-type": "json",
     "interval": 1,
     "on-click": "playerctl play-pause",
-    "on-click-right": "$HOME/.config/rofi/media/rofi-media.sh",
+    "on-click-right": "~/.config/rofi/media/rofi-media.sh",
     "on-scroll-up": "playerctl next",
     "on-scroll-down": "playerctl previous"
   },
@@ -104,7 +105,7 @@
   
   "custom/cpu-temp": {
     "format": "{}",
-    "exec": "$HOME/bin/waybar/cpu-temp.sh",
+    "exec": "~/bin/waybar/cpu-temp.sh",
     "return-type": "json",
     "interval": 2,
     "on-click": "neohtop",
@@ -113,14 +114,14 @@
   
   "custom/arch-update": {
     "format": "󰏗",
-    "exec": "$HOME/bin/waybar/system-update.sh check",
+    "exec": "~/bin/waybar/system-update.sh check",
     "return-type": "json",
     "interval": 1500,
-    "on-click": "$HOME/bin/waybar/system-update.sh up",
+    "on-click": "~/bin/waybar/system-update.sh up",
   },
   
   "custom/system-wrap": {
-    "format": "󰳝",
+    "format": "",
     "tooltip-format": "System Controls"
   },
   
@@ -142,7 +143,7 @@
   },
   
   "custom/clipboard": {
-    "format": "󰅍",
+    "format": "󰋚",
     "tooltip": "Clipboard",
     "on-click": "rofi -show clipboard -config ~/.config/rofi/clipboard/clipboard.rasi",
     // "on-click-right": "cliphist wipe"
@@ -151,7 +152,7 @@
   "custom/powermenu": {
     "format": "⏻",
     "tooltip": "Power Menu",
-    "on-click": "$HOME/bin/waybar/powermenu1.sh"
+    "on-click": "~/bin/waybar/powermenu.sh"
   },
   "custom/notification": {
     "tooltip": false,
@@ -207,7 +208,7 @@
     "interval": 3,
     "tooltip": true,
     "on-click": "nmgui",
-    "on-click-right": "$HOME/.config/rofi/network/rofi-network.sh",
+    "on-click-right": "~/.config/rofi/network/rofi-network.sh",
   },
   
   "wireplumber": {
@@ -225,7 +226,7 @@
     "format-icons": ["󰃞", "󰃟", "󰃠"],
     "on-scroll-up": "swayosd-client --brightness +1",
     "on-scroll-down": "swayosd-client --brightness -1",
-    "on-click": "$HOME/.config/rofi/nightshift/rofi-nightshift.sh"
+    "on-click": "~/.config/rofi/nightshift/rofi-nightshift.sh"
   },
   
   "bluetooth": {
@@ -236,7 +237,7 @@
     "tooltip-format-connected": "{device_alias} {device_battery_percentage}%",
     "tooltip-format-enumerate-connected": "{device_alias} {device_battery_percentage}%",
     "on-click": "blueman-manager",
-    "on-click-right": "$HOME/.config/rofi/network/rofi-bluetooth.sh"
+    "on-click-right": "~/.config/rofi/network/rofi-bluetooth.sh"
   },
   
   "power-profiles-daemon": {

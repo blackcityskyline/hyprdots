@@ -93,13 +93,13 @@
           "update-command": "sh -c 'pgrep -x wlsunset > /dev/null && echo true || echo false'"
         },
         {
-          "label": "󰅌",
+          "label": "",
           "type": "button",
           "active": true,
           "command": "swaync-client -t -sw;sh -c 'rofi -show clipboard -config ~/.config/rofi/clipboard/clipboard.rasi'"
         },
         {
-          "label": "󰄀",
+          "label": "󱣵",
           "type": "toggle",
           "active": false,
           "command": "bash ~/bin/others/screencast_toggle",
@@ -126,14 +126,14 @@
           "update-command": "sh -c 'pactl get-default-sink | grep -qiE \"usb|bluez|hdmi|headphone\" && echo true || echo false'"
         },
         {
-          "label": "󰝹",
+          "label": "",
           "type": "toggle",
           "active": true,
-          "command": "swaync-client -t -sw;sh -c '~/bin/hypr/visuals-toggle.sh'",
-          "update-command": "sh -c '~/bin/hypr/visuals-toggle.sh --status'"
+          "command": "swaync-client -t -sw;sh -c '~/bin/hypr/hyprvisuals'",
+          "update-command": "sh -c '~/bin/hypr/hyprvisuals --status'"
         },
         {
-          "label": "󰍬",
+          "label": "󰍭",
           "type": "toggle",
           "active": false,
           "command": "pactl set-source-mute @DEFAULT_SOURCE@ toggle",
