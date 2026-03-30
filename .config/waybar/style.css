@@ -30,8 +30,8 @@ window#waybar.hidden {
 
 /* Module base style */
 #custom-arch-launcher,
-#custom-mpris-scroll,
-#custom-cpu-temp,
+#custom-waympris,
+#custom-waycpu,
 #custom-notification,
 #hyprland-language,
 #custom-arch-update,
@@ -64,37 +64,37 @@ window#waybar.hidden {
 }
 
 /* MPRIS */
-#custom-mpris-scroll {
+#custom-waympris {
     color: #7aa2f7;
     border: 0px solid rgba(122, 162, 247, 0.2);
     min-width: 0;
 }
 
-#custom-mpris-scroll.Playing {
+#custom-waympris.Playing {
     color: #7aa2f7;
     background-color: rgba(22, 23, 30, 0.9);
 }
 
-#custom-mpris-scroll.Paused {
+#custom-waympris.Paused {
     color: #565f89;
 }
 
-#custom-mpris-scroll.Stopped {
+#custom-waympris.Stopped {
     color: #565f89;
 }
 
 /* CPU temp */
-#custom-cpu-temp {
+#custom-waycpu {
     color: #7aa2f7;
     /* border: 1px solid rgba(122, 162, 247, 0.2); */
 }
 
-#custom-cpu-temp.critical {
+#custom-waycpu.critical {
     color: #f7768e;
     background-color: rgba(247, 118, 142, 0.15);
 }
 
-#custom-cpu-temp.warning {
+#custom-waycpu.warning {
     color: #e0af68;
     background-color: rgba(224, 175, 104, 0.15);
 }
@@ -335,7 +335,6 @@ window#waybar.hidden {
     color: #565f89;
 }
 
-/* Tooltip */
 tooltip {
     background-color: rgba(26, 27, 38, 0.95);
     color: #c0caf5;
@@ -346,14 +345,11 @@ tooltip {
     padding: 8px;
 }
 
-/* Скрытие пустого mpris-модуля - УБРАН ПРОБЛЕМНЫЙ СЕЛЕКТОР :empty */
-/* Вместо этого используем минимальные размеры */
-#custom-mpris-scroll {
+#custom-waympris {
     min-width: 0;
 }
 
-/* Альтернативный способ: скрыть элемент когда нет текста через opacity */
-#custom-mpris-scroll:not(.Playing):not(.Paused) {
+#custom-waympris:not(.Playing):not(.Paused) {
     opacity: 0;
     min-width: 0;
     padding: 0;

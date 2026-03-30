@@ -3,13 +3,13 @@
 # ── CONFIG ────────────────────────────────────────────────────────────────────
 PRIORITY_PLAYERS="spotify youtube-music mpv vlc zen brave"
 cover=/tmp/cover.png
-bkp_cover=~/.config/rofi/media/music.jpg
+bkp_cover=~/.config/rofi/mediabox/music.jpg
 mpddir=~/media/Music
 terminal=foot
-roficonfig="$HOME/.config/rofi/media/media.rasi"
+roficonfig="$HOME/.config/rofi/media/mediabox.rasi"
 STATE_FILE="/tmp/rofi-media-state"
 
-# ── Если вызван напрямую — запускаем rofi в script mode ───────────────────────
+# ── Entry point: if called directly — launch rofi in script mode ──────────────
 if [ -z "$ROFI_OUTSIDE" ]; then
   exec rofi \
     -show media \
@@ -23,7 +23,7 @@ if [ -z "$ROFI_OUTSIDE" ]; then
     -me-accept-entry "MousePrimary"
 fi
 
-# ── Иконки плееров ────────────────────────────────────────────────────────────
+# ── Player declarations ───────────────────────────────────────────────────────
 declare_icon() {
   echo "󰎇"
 }
@@ -77,13 +77,13 @@ resolve_playerctl_name() {
   esac
 }
 
-# ── Определяем активный плеер ─────────────────────────────────────────────────
+# ── Player detection ──────────────────────────────────────────────────────────
 _detect_player() {
   Control="MPD"
   PLAYERCTL_NAME=""
 
-  # Два прохода: сначала Playing, потом Paused — чтобы корректно получить
-  # PLAYERCTL_NAME для браузерных плееров даже когда они на паузе.
+  # Two passes: Playing first, then Paused — ensures correct PLAYERCTL_NAME
+  # for browser-based players even when paused
   for _status_filter in "Playing" "Paused"; do
     [ "$Control" != "MPD" ] && break
     while IFS= read -r inst; do
@@ -103,8 +103,6 @@ _detect_player() {
             break
             ;;
           *)
-            # URL не youtube/twitch — всё равно фиксируем как generic,
-            # иначе цикл продолжится и найдёт paused mpv/другой плеер
             Control="$inst"
             PLAYERCTL_NAME="$inst"
             break
@@ -150,7 +148,7 @@ _detect_player() {
   [ -z "$PLAYERCTL_NAME" ] && PLAYERCTL_NAME=$(resolve_playerctl_name "$Control")
 }
 
-# ── Парсинг title из url ───────────────────────────────────────────────────────
+# ── Parse title from URL ──────────────────────────────────────────────────────
 _title_from_url() {
   basename "$1" | python3 -c "
 import sys, urllib.parse
@@ -159,48 +157,46 @@ print(name.rsplit('.', 1)[0])
 "
 }
 
-# ── Сборка обложки ────────────────────────────────────────────────────────────
+# ── Cover art builder ─────────────────────────────────────────────────────────
 _build_cover() {
   local title="$1" artist="$2" albumart="$3" xesam_url="$4"
   local cover_ok=0
-  # mktemp защищает от гонки при быстрой смене треков (фоновые процессы)
-  local tmp_raw; tmp_raw="$(mktemp /tmp/cover_raw_XXXXXX.png)"
+  # mktemp prevents race conditions when tracks change rapidly
+  local tmp_raw
+  tmp_raw="$(mktemp /tmp/cover_raw_XXXXXX.png)"
 
   local cache_dir="/tmp/rofi-media-covers"
   mkdir -p "$cache_dir"
   local cache_key
   cache_key="$(printf '%s' "${title}${albumart}" | md5sum | cut -d' ' -f1)"
   local cache_file="$cache_dir/${cache_key}.png"
-  # Проверяем кеш, но не доверяем если файл совпадает с bkp_cover
-  # (значит предыдущий запрос тоже упал на fallback — нужно повторить попытку)
+
+  # Use cache unless it contains the fallback placeholder
   if [ -f "$cache_file" ]; then
     if ! cmp -s "$cache_file" "$bkp_cover"; then
       cp "$cache_file" "$cover"
       rm -f "$tmp_raw"
       return
     else
-      # Стale placeholder в кеше — удаляем, будем пробовать заново
       rm -f "$cache_file"
     fi
   fi
 
-  # Флаг: это лайв-стрим без возможности поиска по названию
-  # (twitch/kick — title содержит URL канала, iTunes/yt-dlp поиск бессмысленен)
-  # YouTube не считаем стримом — стратегия 2 достаёт обложку через video_id напрямую
+  # Live streams (twitch/kick) — skip title-based searches
   local _is_stream=0
   case "$xesam_url$title" in *twitch.tv* | *kick.com*) _is_stream=1 ;; esac
 
-  # Стратегия 0 (Twitch): аватарка канала через публичный Twitch GQL
-  # Канал может быть в title (mpv через пайп) или в xesam_url (браузер)
+  # Strategy 0: Twitch — fetch channel avatar via public GQL API
   local twitch_channel=""
-  case "$title"     in *twitch.tv/*) twitch_channel="$(printf '%s' "$title"     | sed 's|.*twitch\.tv/||; s|[/?# ].*||' | tr '[:upper:]' '[:lower:]')" ;; esac
-  case "$xesam_url" in *twitch.tv/*) twitch_channel="$(printf '%s' "$xesam_url" | sed 's|.*twitch\.tv/||; s|[/?#].*||'  | tr '[:upper:]' '[:lower:]')" ;; esac
+  case "$title" in *twitch.tv/*) twitch_channel="$(printf '%s' "$title" | sed 's|.*twitch\.tv/||; s|[/?# ].*||' | tr '[:upper:]' '[:lower:]')" ;; esac
+  case "$xesam_url" in *twitch.tv/*) twitch_channel="$(printf '%s' "$xesam_url" | sed 's|.*twitch\.tv/||; s|[/?#].*||' | tr '[:upper:]' '[:lower:]')" ;; esac
 
-  if [ "$cover_ok" = 0 ] && [ -n "$twitch_channel" ] && \
-     [ "$twitch_channel" != "directory" ] && [ "$twitch_channel" != "videos" ] && \
-     [ "$twitch_channel" != "following" ]; then
+  if [ "$cover_ok" = 0 ] && [ -n "$twitch_channel" ] &&
+    [ "$twitch_channel" != "directory" ] && [ "$twitch_channel" != "videos" ] &&
+    [ "$twitch_channel" != "following" ]; then
     local avatar_url
-    avatar_url="$(python3 - "$twitch_channel" <<'PYEOF'
+    avatar_url="$(
+      python3 - "$twitch_channel" <<'PYEOF'
 import sys, json, urllib.request
 channel = sys.argv[1]
 body = json.dumps({"query": "{ user(login: \"%s\") { profileImageURL(width: 300) } }" % channel}).encode()
@@ -215,43 +211,44 @@ try:
 except Exception:
     pass
 PYEOF
-)"
+    )"
     [ -n "$avatar_url" ] && curl -sf --max-time 8 "$avatar_url" --output "$tmp_raw" && cover_ok=1
   fi
 
-  # Стратегия 0b (Kick): thumbnail канала через публичный API
+  # Strategy 0b: Kick — fetch channel thumbnail via public API
   local kick_channel=""
-  case "$title"     in *kick.com/*) kick_channel="$(printf '%s' "$title"     | sed 's|.*kick\.com/||; s|[/?# ].*||' | tr '[:upper:]' '[:lower:]')" ;; esac
-  case "$xesam_url" in *kick.com/*) kick_channel="$(printf '%s' "$xesam_url" | sed 's|.*kick\.com/||; s|[/?#].*||'  | tr '[:upper:]' '[:lower:]')" ;; esac
+  case "$title" in *kick.com/*) kick_channel="$(printf '%s' "$title" | sed 's|.*kick\.com/||; s|[/?# ].*||' | tr '[:upper:]' '[:lower:]')" ;; esac
+  case "$xesam_url" in *kick.com/*) kick_channel="$(printf '%s' "$xesam_url" | sed 's|.*kick\.com/||; s|[/?#].*||' | tr '[:upper:]' '[:lower:]')" ;; esac
 
   if [ "$cover_ok" = 0 ] && [ -n "$kick_channel" ]; then
     local kick_thumb
-    kick_thumb="$(curl -sf --max-time 8 "https://kick.com/api/v1/channels/${kick_channel}" 2>/dev/null |       python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('user',{}).get('profile_pic') or d.get('livestream',{}).get('thumbnail',{}).get('url',''))" 2>/dev/null)"
+    kick_thumb="$(curl -sf --max-time 8 "https://kick.com/api/v1/channels/${kick_channel}" 2>/dev/null | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('user',{}).get('profile_pic') or d.get('livestream',{}).get('thumbnail',{}).get('url',''))" 2>/dev/null)"
     [ -n "$kick_thumb" ] && curl -sf --max-time 8 "$kick_thumb" --output "$tmp_raw" && cover_ok=1
   fi
 
-  # Стратегия 1: iTunes API — только для музыки (не стримы)
-  # xesam_url уже передан параметром, лишний вызов playerctl не нужен
+  # Strategy 1: iTunes API — music only, not streams
   if [ "$cover_ok" = 0 ] && [ "$_is_stream" = 0 ] && { [ -n "$artist" ] || [ -n "$album" ]; }; then
     local itunes_query
     [ -n "$album" ] && itunes_query="${artist} ${album}" || itunes_query="${artist} ${title}"
-    local itunes_term; itunes_term="$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$itunes_query" 2>/dev/null)"
-    local itunes_json; itunes_json="$(curl -sf --max-time 8 "https://itunes.apple.com/search?term=${itunes_term}&entity=album&limit=1" 2>/dev/null)"
-    local itunes_url; itunes_url="$(printf '%s' "$itunes_json" | jq -r '.results[0].artworkUrl100 // empty' 2>/dev/null)"
+    local itunes_term
+    itunes_term="$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$itunes_query" 2>/dev/null)"
+    local itunes_json
+    itunes_json="$(curl -sf --max-time 8 "https://itunes.apple.com/search?term=${itunes_term}&entity=album&limit=1" 2>/dev/null)"
+    local itunes_url
+    itunes_url="$(printf '%s' "$itunes_json" | jq -r '.results[0].artworkUrl100 // empty' 2>/dev/null)"
     if [ -n "$itunes_url" ]; then
       itunes_url="${itunes_url/100x100bb/600x600bb}"
       curl -sf --max-time 8 "$itunes_url" --output "$tmp_raw" && cover_ok=1
     fi
   fi
 
-  # Стратегия 2: video_id из xesam_url (zen/firefox + youtube-music без artUrl)
+  # Strategy 2: extract video_id from xesam_url (browser + youtube-music without artUrl)
   if [ "$cover_ok" = 0 ] && [ -z "$albumart" ] && [ -n "$xesam_url" ]; then
     local video_id
     video_id="$(python3 -c "
 import urllib.parse, sys
 url = sys.argv[1]
 parsed = urllib.parse.urlparse(url)
-# youtu.be/VIDEO_ID короткие ссылки
 if parsed.netloc in ('youtu.be', 'www.youtu.be'):
     print(parsed.path.lstrip('/').split('/')[0])
 else:
@@ -265,12 +262,10 @@ else:
     fi
   fi
 
-  # Стратегия 3: artUrl
+  # Strategy 3: artUrl
   if [ "$cover_ok" = 0 ] && [ -n "$albumart" ]; then
     case "$albumart" in
     file://*)
-      # Если xesam_url содержит youtube — берём video_id оттуда (zen/firefox)
-      # Иначе — из config.json (youtube-music electron)
       local video_id
       if printf '%s' "$xesam_url" | grep -qE 'youtube|youtu\.be'; then
         video_id="$(python3 -c "
@@ -314,7 +309,7 @@ print(qs.get('v', [''])[0])
     esac
   fi
 
-  # Стратегия 4: обложка встроена в аудиофайл
+  # Strategy 4: cover embedded in audio file
   if [ "$cover_ok" = 0 ]; then
     local file_url
     file_url="$(playerctl --player="$PLAYERCTL_NAME" metadata xesam:url 2>/dev/null)"
@@ -326,7 +321,7 @@ print(qs.get('v', [''])[0])
     fi
   fi
 
-  # Стратегия 5: yt-dlp поиск (только не для стримов)
+  # Strategy 5: yt-dlp search — music only, not streams
   if [ "$cover_ok" = 0 ] && [ "$_is_stream" = 0 ] && [ -n "$title" ] && [ "$title" != "Play Something" ]; then
     if command -v yt-dlp >/dev/null 2>&1; then
       local search_title
@@ -339,7 +334,7 @@ print(qs.get('v', [''])[0])
     fi
   fi
 
-  # Стратегия 6: YouTube scrape (только не для стримов)
+  # Strategy 6: YouTube scrape — music only, not streams
   if [ "$cover_ok" = 0 ] && [ "$_is_stream" = 0 ] && [ -n "$title" ] && [ "$title" != "Play Something" ]; then
     local scrape_title
     scrape_title="$(printf '%s' "${title%.*}" | sed 's/([^)]*)//g; s/\[[^]]*\]//g; s/  */ /g; s/^ //; s/ $//')"
@@ -374,11 +369,9 @@ geq=r=0:g=0:b=0:a='min(255,max(0,(Y/283-0.60)/0.40)*255)'[grad];\
     { cp "$tmp_raw" /tmp/cover_new.png && mv /tmp/cover_new.png "$cover"; }
 
   rm -f "$tmp_raw"
-
 }
 
-
-# ── Метаданные MPRIS ──────────────────────────────────────────────────────────
+# ── MPRIS metadata ────────────────────────────────────────────────────────────
 _get_metadata() {
   player_icon=$(declare_icon "$Control")
 
@@ -396,7 +389,6 @@ _get_metadata() {
   fi
 
   title=${title:-Play Something}
-
   status=$(playerctl --player="$PLAYERCTL_NAME" status 2>/dev/null)
   status=${status:-Stopped}
 
@@ -414,18 +406,19 @@ _get_metadata() {
     playlist="0:00 / 0:00"
   fi
 
-  # Для Twitch — показываем аптайм стрима вместо позиции
-  # Канал может быть в title (mpv через пайп) или в xesam:url (браузер)
+  # Twitch: show stream uptime instead of position
   local _twitch_channel=""
-  local _xesam_url; _xesam_url="$(playerctl --player="$PLAYERCTL_NAME" metadata xesam:url 2>/dev/null)"
-  case "$title"      in *twitch.tv/*) _twitch_channel="$(printf '%s' "$title"      | sed 's|.*twitch\.tv/||; s|[/?# ].*||' | tr '[:upper:]' '[:lower:]')" ;; esac
-  case "$_xesam_url" in *twitch.tv/*) _twitch_channel="$(printf '%s' "$_xesam_url" | sed 's|.*twitch\.tv/||; s|[/?#].*||'  | tr '[:upper:]' '[:lower:]')" ;; esac
+  local _xesam_url
+  _xesam_url="$(playerctl --player="$PLAYERCTL_NAME" metadata xesam:url 2>/dev/null)"
+  case "$title" in *twitch.tv/*) _twitch_channel="$(printf '%s' "$title" | sed 's|.*twitch\.tv/||; s|[/?# ].*||' | tr '[:upper:]' '[:lower:]')" ;; esac
+  case "$_xesam_url" in *twitch.tv/*) _twitch_channel="$(printf '%s' "$_xesam_url" | sed 's|.*twitch\.tv/||; s|[/?#].*||' | tr '[:upper:]' '[:lower:]')" ;; esac
 
   if [ -n "$_twitch_channel" ]; then
     local uptime_cache="/tmp/twitch_uptime_${_twitch_channel}"
-    local now; now="$(date +%s)"
-    # Обновляем кеш не чаще раза в 60 секунд
-    if [ ! -f "$uptime_cache" ] || [ $(( now - $(stat -c %Y "$uptime_cache" 2>/dev/null || echo 0) )) -ge 60 ]; then
+    local now
+    now="$(date +%s)"
+    # Refresh cache at most once per 60 seconds
+    if [ ! -f "$uptime_cache" ] || [ $((now - $(stat -c %Y "$uptime_cache" 2>/dev/null || echo 0))) -ge 60 ]; then
       python3 - "$_twitch_channel" "$uptime_cache" <<'PYEOF' &
 import sys, json, urllib.request, datetime, os
 
@@ -438,7 +431,7 @@ req = urllib.request.Request(
 try:
     with urllib.request.urlopen(req, timeout=8) as r:
         d = json.load(r)
-    created_at = d["data"]["user"]["stream"]["createdAt"]  # "2024-01-01T12:00:00Z"
+    created_at = d["data"]["user"]["stream"]["createdAt"]
     start = datetime.datetime.fromisoformat(created_at.replace("Z", "+00:00"))
     delta = int((datetime.datetime.now(datetime.timezone.utc) - start).total_seconds())
     h, rem = divmod(delta, 3600)
@@ -447,11 +440,9 @@ try:
     with open(cache_path, "w") as f:
         f.write(result)
 except Exception:
-    # Стрим оффлайн или ошибка — пишем пустую строку чтобы не зависать
     open(cache_path, "w").close()
 PYEOF
     fi
-    # Читаем кеш (может быть пустым если стрим оффлайн)
     local uptime_str=""
     [ -f "$uptime_cache" ] && uptime_str="$(cat "$uptime_cache" 2>/dev/null)"
     [ -n "$uptime_str" ] && playlist="$uptime_str"
@@ -459,26 +450,24 @@ PYEOF
 
   albumart="$(playerctl --player="$PLAYERCTL_NAME" metadata mpris:artUrl 2>/dev/null)"
 
-  # Ключ: только трек + плеер. albumart намеренно исключён — ряд плееров
-  # (Spotify, браузеры) обнуляют artUrl при паузе, что раньше вызывало
-  # перестройку обложки с пустым albumart и показ placeholder-заглушки.
+  # Cover key: track + player only. albumart intentionally excluded —
+  # some players (Spotify, browsers) clear artUrl on pause, which caused
+  # cover rebuild with empty albumart and showed the placeholder.
   local cover_key="${Control}${title}${artist}"
   local last_key=""
   [ -f "$STATE_FILE" ] && last_key=$(cat "$STATE_FILE" 2>/dev/null)
 
   if [ "$cover_key" != "$last_key" ] || cmp -s "$cover" "$bkp_cover"; then
     printf '%s' "$cover_key" >"$STATE_FILE"
-
-    # Сразу заменяем обложку плейсхолдером — иначе при смене источника/трека
-    # старая обложка висит до окончания фоновой сборки новой.
+    # Show placeholder immediately while new cover builds in background
     cp "$bkp_cover" "$cover"
-
-    local xesam_url; xesam_url="$(playerctl --player="$PLAYERCTL_NAME" metadata xesam:url 2>/dev/null)"
+    local xesam_url
+    xesam_url="$(playerctl --player="$PLAYERCTL_NAME" metadata xesam:url 2>/dev/null)"
     _build_cover "$title" "$artist" "$albumart" "$xesam_url" &
   fi
 }
 
-# ── Метаданные MPD ────────────────────────────────────────────────────────────
+# ── MPD metadata ──────────────────────────────────────────────────────────────
 _get_metadata_mpd() {
   player_icon=""
   ffmpeg -i "$mpddir"/"$(mpc current -f %file%)" -vf scale=500:500 "$cover" -y 2>/dev/null || cp "$bkp_cover" "$cover"
@@ -501,8 +490,7 @@ _get_metadata_mpd() {
   playlist=${playlist:-0/0}
 }
 
-# ── Лирика ────────────────────────────────────────────────────────────────────
-# Принимает title и artist как аргументы — работает и для MPRIS и для MPD
+# ── Lyrics ────────────────────────────────────────────────────────────────────
 _fetch_lyrics() {
   local Title="$1" Artist="$2"
   local url="https://api.lyrics.ovh/v1/$Artist/$Title"
@@ -522,12 +510,12 @@ _mpclyrics() {
   _fetch_lyrics "$(mpc -f %title% current)" "$(mpc -f %artist% current)"
 }
 
-# ── Вывод меню ────────────────────────────────────────────────────────────────
+# ── Menu output ───────────────────────────────────────────────────────────────
 _print_menu() {
   local artist_line="${artist:-}"
   [ -z "$artist_line" ] && [ -n "$album" ] && artist_line="$album"
 
-  # Для Twitch аптайм уже содержит 🔴 — иконка плеера перед ним лишняя
+  # Twitch uptime already contains 🔴 — skip player icon prefix
   local prompt_icon="$icon  "
   case "$playlist" in 🔴*) prompt_icon="" ;; esac
 
@@ -542,7 +530,7 @@ _print_menu() {
     "󰦨"
 }
 
-# ── Обработка выбора ──────────────────────────────────────────────────────────
+# ── Action handler ────────────────────────────────────────────────────────────
 _handle_action() {
   local sel="$1"
   case $Control in
@@ -580,7 +568,7 @@ _handle_action() {
   esac
 }
 
-# ── Главная логика ────────────────────────────────────────────────────────────
+# ── Main ──────────────────────────────────────────────────────────────────────
 export ROFI_OUTSIDE=1
 
 _detect_player
@@ -604,8 +592,8 @@ case "${ROFI_RETV:-0}" in
   ;;
 esac
 
-# ── Диагностика: запусти вручную чтобы увидеть что видит скрипт ─────────────
-# ROFI_OUTSIDE=1 bash rofi-media.sh --debug-mpv
+# ── Debug helpers ─────────────────────────────────────────────────────────────
+# Usage: ROFI_OUTSIDE=1 bash rofi-mediabox --debug-mpv
 if [ "${1:-}" = "--debug-mpv" ]; then
   export ROFI_OUTSIDE=1
   _detect_player
@@ -615,7 +603,7 @@ if [ "${1:-}" = "--debug-mpv" ]; then
   playerctl --player="$PLAYERCTL_NAME" metadata 2>/dev/null
 fi
 
-# ROFI_OUTSIDE=1 bash rofi-media.sh --debug-twitch
+# Usage: ROFI_OUTSIDE=1 bash rofi-mediabox --debug-twitch
 if [ "${1:-}" = "--debug-twitch" ]; then
   export ROFI_OUTSIDE=1
   _detect_player
@@ -626,10 +614,11 @@ if [ "${1:-}" = "--debug-twitch" ]; then
   echo "title:          $title_dbg"
   echo "xesam:url:      $xesam_url_dbg"
   twitch_channel=""
-  case "$title_dbg"     in *twitch.tv/*) twitch_channel="$(printf '%s' "$title_dbg"     | sed 's|.*twitch\.tv/||; s|[/?# ].*||' | tr '[:upper:]' '[:lower:]')" ;; esac
-  case "$xesam_url_dbg" in *twitch.tv/*) twitch_channel="$(printf '%s' "$xesam_url_dbg" | sed 's|.*twitch\.tv/||; s|[/?#].*||'  | tr '[:upper:]' '[:lower:]')" ;; esac
+  case "$title_dbg" in *twitch.tv/*) twitch_channel="$(printf '%s' "$title_dbg" | sed 's|.*twitch\.tv/||; s|[/?# ].*||' | tr '[:upper:]' '[:lower:]')" ;; esac
+  case "$xesam_url_dbg" in *twitch.tv/*) twitch_channel="$(printf '%s' "$xesam_url_dbg" | sed 's|.*twitch\.tv/||; s|[/?#].*||' | tr '[:upper:]' '[:lower:]')" ;; esac
   echo "twitch_channel: $twitch_channel"
-  avatar_url="$(python3 - "$twitch_channel" <<'PYEOF'
+  avatar_url="$(
+    python3 - "$twitch_channel" <<'PYEOF'
 import sys, json, urllib.request
 channel = sys.argv[1]
 body = json.dumps({"query": "{ user(login: \"%s\") { profileImageURL(width: 300) } }" % channel}).encode()
@@ -645,7 +634,9 @@ try:
 except Exception as e:
     print("ERROR:", e, file=sys.stderr)
 PYEOF
-2>/tmp/twitch_debug_raw.txt)"
-  echo "GQL raw response:"; cat /tmp/twitch_debug_raw.txt
+    2>/tmp/twitch_debug_raw.txt
+  )"
+  echo "GQL raw response:"
+  cat /tmp/twitch_debug_raw.txt
   echo "avatar_url:     $avatar_url"
 fi

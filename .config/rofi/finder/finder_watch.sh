@@ -31,13 +31,10 @@ done
 inotifywait -m -r \
   -e create,delete,move,modify,attrib \
   --format '%w' \
-  "${existing_dirs[@]}" 2>/dev/null | \
-while read -r changed_dir; do
-  # Инвалидируем кэш корневой директории
-  rm -f "$CACHE_DIR/$ROOT_KEY"
-
-  # Инвалидируем кэш изменённой директории
-  ckey="${changed_dir%/}"
-  ckey="${ckey//\//_}"
-  rm -f "$CACHE_DIR/$ckey"
-done
+  "${existing_dirs[@]}" 2>/dev/null |
+  while read -r changed_dir; do
+    rm -f "$CACHE_DIR/$ROOT_KEY"
+    ckey="${changed_dir%/}"
+    ckey="${ckey//\//_}"
+    rm -f "$CACHE_DIR/$ckey"
+  done

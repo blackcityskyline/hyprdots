@@ -1,0 +1,1 @@
+rofi -show clipboard -config ~/.config/rofi/clipboard/clipboard.rasi # Clipboard and snippets

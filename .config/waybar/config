@@ -11,9 +11,9 @@
   
   "modules-left": [
     "custom/arch-launcher",
-    "custom/mpris-scroll",
+    "custom/waympris",
     // "hyprland/window"
-    "custom/cpu-temp",
+    "custom/waycpu",
     "hyprland/language"
   ],
   
@@ -37,12 +37,12 @@
   
   "custom/arch-launcher": {
     "format": " ",
-    "exec": "~/bin/waybar/system-update.sh check",
+    "exec": "~/bin/waybar/wayupdate check",
     "return-type": "json",
     "interval": 1500,
     "tooltip": "App launcher",
     "on-click": "rofi -show drun -config ~/.config/rofi/launcher/launcher.rasi", // App Launcher
-    "on-click-right": "~/bin/waybar/system-update.sh up", // Update script
+    "on-click-right": "~/bin/waybar/wayupdate up", // Update script
   },
   
   "hyprland/workspaces": {
@@ -91,9 +91,9 @@
     // "on-click": "hyprctl switchxkblayout at-translated-set-2-keyboard next"
   },
   
-  "custom/mpris-scroll": {
+  "custom/waympris": {
     "format": "{}",
-    "exec": "~/bin/waybar/mpris-scroll.sh",
+    "exec": "~/bin/waybar/waympris",
     "return-type": "json",
     "interval": 1,
     "on-click": "playerctl play-pause",
@@ -103,9 +103,9 @@
   },
 
   
-  "custom/cpu-temp": {
+  "custom/waycpu": {
     "format": "{}",
-    "exec": "~/bin/waybar/cpu-temp.sh",
+    "exec": "~/bin/waybar/waycpu",
     "return-type": "json",
     "interval": 2,
     "on-click": "neohtop",
@@ -114,10 +114,10 @@
   
   "custom/arch-update": {
     "format": "󰏗",
-    "exec": "~/bin/waybar/system-update.sh check",
+    "exec": "~/bin/waybar/wayupdate check",
     "return-type": "json",
     "interval": 1500,
-    "on-click": "~/bin/waybar/system-update.sh up",
+    "on-click": "~/bin/waybar/wayupdate up",
   },
   
   "custom/system-wrap": {
@@ -203,7 +203,7 @@
   
   "custom/network": {
     "format": "{}",
-    "exec": "~/bin/waybar/network.sh",
+    "exec": "~/bin/waybar/waynetwork",
     "return-type": "json",
     "interval": 3,
     "tooltip": true,

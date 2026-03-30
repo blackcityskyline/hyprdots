@@ -14,7 +14,7 @@
 if [ -z "$ROFI_OUTSIDE" ]; then
   exec rofi \
     -show find \
-    -modi "find:$0,grep:~/.config/rofi/finder/grep.sh" \
+    -modi "find:$0,grep:~/.config/rofi/finder/rofi-grep" \
     -config ~/.config/rofi/finder/finder.rasi
 fi
 
@@ -82,27 +82,27 @@ file_icon() {
   [[ "$ext" == "$f" ]] && ext=""
   ext="${ext,,}"
   case "$ext" in
-    md|markdown|rst)            echo "󰧮" ;;
-    txt)                        echo "󰈙" ;;
-    sh|bash|zsh|fish)           echo "" ;;
-    py)                         echo "" ;;
-    rs)                         echo "" ;;
-    go)                         echo "" ;;
-    js|mjs|ts|jsx|tsx|svelte|vue) echo "" ;;
-    json|jsonc|yaml|yml|toml)   echo "" ;;
-    conf|ini|cfg|env|rasi)      echo "" ;;
-    html|htm|css|scss|sass)     echo "" ;;
-    c|cpp|h|hpp)                echo "" ;;
-    java|kt|swift|cs)           echo "" ;;
-    rb|php|lua|el|hs|ml)        echo "" ;;
-    sql)                        echo "" ;;
-    png|jpg|jpeg|gif|webp)      echo "󰋩" ;;
-    svg)                        echo "󰜡" ;;
-    mp3|flac|wav|ogg|opus)      echo "󰎆" ;;
-    mp4|mkv|avi|mov|webm)       echo "󰕧" ;;
-    pdf)                        echo "" ;;
-    zip|tar|gz|bz2|xz|zst|7z)  echo "󰏗" ;;
-    *)                          echo "󰈔" ;;
+  md | markdown | rst) echo "󰧮" ;;
+  txt) echo "󰈙" ;;
+  sh | bash | zsh | fish) echo "" ;;
+  py) echo "" ;;
+  rs) echo "" ;;
+  go) echo "" ;;
+  js | mjs | ts | jsx | tsx | svelte | vue) echo "" ;;
+  json | jsonc | yaml | yml | toml) echo "" ;;
+  conf | ini | cfg | env | rasi) echo "" ;;
+  html | htm | css | scss | sass) echo "" ;;
+  c | cpp | h | hpp) echo "" ;;
+  java | kt | swift | cs) echo "" ;;
+  rb | php | lua | el | hs | ml) echo "" ;;
+  sql) echo "" ;;
+  png | jpg | jpeg | gif | webp) echo "󰋩" ;;
+  svg) echo "󰜡" ;;
+  mp3 | flac | wav | ogg | opus) echo "󰎆" ;;
+  mp4 | mkv | avi | mov | webm) echo "󰕧" ;;
+  pdf) echo "" ;;
+  zip | tar | gz | bz2 | xz | zst | 7z) echo "󰏗" ;;
+  *) echo "󰈔" ;;
   esac
 }
 
@@ -283,7 +283,7 @@ build_list() {
   if [[ "$dir" == "$START_DIR" ]]; then
     # Недавние файлы по всем SEARCH_DIRS
     _tmpr="$(mktemp -p "$CACHE_DIR")"
-    get_recent_all > "$_tmpr" &
+    get_recent_all >"$_tmpr" &
     local pid_r=$!
 
     local existing_dirs=()
@@ -294,7 +294,7 @@ build_list() {
     fd --hidden --type d --max-depth 1 "${FD_EXCLUDES[@]}" . "${existing_dirs[@]}" 2>/dev/null |
       sort |
       awk -v h="$HOME/" '{rel=$0; sub(h,"",rel); printf " %s\t%s\n", rel, $0}' \
-      > "$_tmpd" &
+        >"$_tmpd" &
     local pid_d=$!
 
     fd --hidden --type f "${FD_EXCLUDES[@]}" --max-results="$MAX_RESULTS" . "${existing_dirs[@]}" 2>/dev/null |
@@ -305,7 +305,7 @@ build_list() {
         icon="$(file_icon "$path")"
         printf '%s %s\t%s\n' "$icon" "$rel" "$path"
       done \
-      > "$_tmpf" &
+        >"$_tmpf" &
     local pid_f=$!
 
     wait "$pid_r"
@@ -318,14 +318,14 @@ build_list() {
   else
     if [[ "$dir" == "$HOME" || "$dir" == "$HOME/"* ]]; then
       _tmpr="$(mktemp -p "$CACHE_DIR")"
-      get_recent "$dir" > "$_tmpr" &
+      get_recent "$dir" >"$_tmpr" &
       local pid_r=$!
     fi
 
     fd --hidden --type d --max-depth 1 "${FD_EXCLUDES[@]}" . "$dir" 2>/dev/null |
       sort |
       awk -v p="$prefix" '{rel=substr($0, length(p)+1); printf " %s\t%s\n", rel, $0}' \
-      > "$_tmpd" &
+        >"$_tmpd" &
     local pid_d=$!
 
     fd --hidden --type f "${FD_EXCLUDES[@]}" --max-results="$MAX_RESULTS" . "$dir" 2>/dev/null |
@@ -336,7 +336,7 @@ build_list() {
         icon="$(file_icon "$path")"
         printf '%s %s\t%s\n' "$icon" "$rel" "$path"
       done \
-      > "$_tmpf" &
+        >"$_tmpf" &
     local pid_f=$!
 
     if [[ -n "${pid_r:-}" ]]; then
@@ -349,9 +349,13 @@ build_list() {
     fi
   fi
 
-  wait "$pid_d"; cat "$_tmpd"
-  wait "$pid_f"; cat "$_tmpf"
-  rm -f "$_tmpd" "$_tmpf"; _tmpd=""; _tmpf=""
+  wait "$pid_d"
+  cat "$_tmpd"
+  wait "$pid_f"
+  cat "$_tmpf"
+  rm -f "$_tmpd" "$_tmpf"
+  _tmpd=""
+  _tmpf=""
 }
 
 # ── Кэш: мгновенно, обновление в фоне ────────────────────────────────────────
@@ -366,13 +370,13 @@ list_dir() {
     printf -v now '%(%s)T' -1
     cache_mtime="$(stat -c %Y "$cfile" 2>/dev/null)" || cache_mtime=0
     dir_mtime="$(stat -c %Y "$dir" 2>/dev/null)" || dir_mtime=0
-    local age=$(( now - cache_mtime ))
-    if (( age >= CACHE_TTL )) || (( cache_mtime < dir_mtime )); then
-      ( build_list "$dir" > "$cfile" ) &
+    local age=$((now - cache_mtime))
+    if ((age >= CACHE_TTL)) || ((cache_mtime < dir_mtime)); then
+      (build_list "$dir" >"$cfile") &
     fi
   else
     build_list_shallow "$dir"
-    ( build_list "$dir" > "$cfile" ) &
+    (build_list "$dir" >"$cfile") &
   fi
 }
 
@@ -390,7 +394,8 @@ open_file() {
 open_manager() {
   local sel="$1"
   if [[ -f "$sel" ]]; then
-    local d="${sel%/*}"; [[ -z "$d" ]] && d="/"
+    local d="${sel%/*}"
+    [[ -z "$d" ]] && d="/"
     setsid xdg-open "$d" </dev/null >/dev/null 2>&1 &
   elif [[ -d "$sel" ]]; then
     setsid xdg-open "$sel" </dev/null >/dev/null 2>&1 &
@@ -401,7 +406,7 @@ open_manager() {
 if [[ "$1" == "--build-cache" ]]; then
   ckey="${START_DIR//\//_}"
   cfile="$CACHE_DIR/$ckey"
-  build_list "$START_DIR" > "$cfile"
+  build_list "$START_DIR" >"$cfile"
   exit 0
 fi
 

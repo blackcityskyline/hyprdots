@@ -1,0 +1,426 @@
+#!/usr/bin/env bash
+# Night Shift Control (wlsunset + rofi settings)
+
+LOCKFILE="/tmp/wlsunset.lock"
+PIDFILE="/tmp/wlsunset.pid"
+CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/rofi/nightshift/nightshift.conf"
+RASI_THEME="$HOME/.config/rofi/network/network.rasi"
+MAX_LINES=15
+
+export WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-wayland-1}"
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+
+# --- icons ---
+
+SETTINGS="󰒓" TEMP="󰔏" TIME="󰥔" DURATION="󰔛" MODE="󰖔"
+STATUS="󰋼" TOGGLE="󰔡" BACK="󰜺" EXIT="󰿅"
+
+# --- config ---
+
+init_config() {
+  [[ -f "$CONFIG_FILE" ]] && return
+  mkdir -p "$(dirname "$CONFIG_FILE")"
+  cat >"$CONFIG_FILE" <<'EOF'
+DAY_TEMP=5500
+NIGHT_TEMP=3300
+DAWN_TIME="14:00"
+DUSK_TIME="18:00"
+TRANSITION_DURATION=2700
+# LAT="53.9"
+# LON="27.6"
+EOF
+}
+
+set_setting() {
+  local key="$1" value="$2"
+  if grep -q "^${key}=" "$CONFIG_FILE"; then
+    sed -i "s|^${key}=.*|${key}=${value}|" "$CONFIG_FILE"
+  else
+    sed -i "s|^# *${key}=.*|${key}=${value}|" "$CONFIG_FILE"
+    grep -q "^${key}=" "$CONFIG_FILE" || echo "${key}=${value}" >>"$CONFIG_FILE"
+  fi
+}
+
+comment_setting() { sed -i "s|^${1}=|# ${1}=|" "$CONFIG_FILE"; }
+
+# --- helpers ---
+
+notify() {
+  command -v notify-send &>/dev/null &&
+    notify-send "Night Shift" "$1" -t "${2:-2000}" 2>/dev/null || true
+  echo "$1" >&2
+}
+
+is_running() {
+  [[ -f "$PIDFILE" ]] || return 1
+  local pid
+  pid=$(cat "$PIDFILE" 2>/dev/null)
+  [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null &&
+    ps -p "$pid" -o comm= 2>/dev/null | grep -q "wlsunset"
+}
+
+restart_if_running() { is_running && restart; }
+
+# --- backend ---
+
+start_wlsunset() {
+  [[ -f "$CONFIG_FILE" ]] && source "$CONFIG_FILE"
+  pkill -9 -x wlsunset 2>/dev/null || true
+  rm -f "$PIDFILE"
+  sleep 0.5
+
+  command -v wlsunset &>/dev/null || {
+    notify "Error: wlsunset not found"
+    exit 1
+  }
+
+  [[ $DAY_TEMP -le $NIGHT_TEMP ]] && {
+    notify "Error: DAY_TEMP ($DAY_TEMP) must be higher than NIGHT_TEMP ($NIGHT_TEMP)"
+    exit 1
+  }
+
+  local -a cmd=(wlsunset)
+  if [[ -n "${LAT:-}" && -n "${LON:-}" ]]; then
+    cmd+=(-l "$LAT" -L "$LON")
+  elif [[ -n "${DAWN_TIME:-}" && -n "${DUSK_TIME:-}" ]]; then
+    cmd+=(-S "$DAWN_TIME" -s "$DUSK_TIME")
+  fi
+  cmd+=(-t "$NIGHT_TEMP" -T "$DAY_TEMP" -d "$TRANSITION_DURATION")
+
+  "${cmd[@]}" >/tmp/wlsunset.log 2>&1 &
+  local pid=$!
+  sleep 2
+
+  if kill -0 "$pid" 2>/dev/null; then
+    echo "$pid" >"$PIDFILE"
+    notify "Night Shift enabled"
+  else
+    notify "Error: failed to start wlsunset"
+    cat /tmp/wlsunset.log >&2
+    exit 1
+  fi
+}
+
+stop_wlsunset() {
+  if is_running; then
+    local pid
+    pid=$(cat "$PIDFILE" 2>/dev/null)
+    kill "$pid" 2>/dev/null || true
+    sleep 0.5
+    pkill -9 -x wlsunset 2>/dev/null || true
+    rm -f "$PIDFILE"
+    sleep 0.5
+    notify "Night Shift disabled"
+  else
+    notify "Night Shift is already off"
+  fi
+}
+
+toggle() { is_running && stop_wlsunset || start_wlsunset; }
+restart() {
+  stop_wlsunset
+  sleep 2
+  start_wlsunset
+}
+
+status() {
+  source "$CONFIG_FILE"
+  if is_running; then
+    echo "Night Shift: ON"
+    echo "Day: ${DAY_TEMP}K / Night: ${NIGHT_TEMP}K"
+    [[ -n "${LAT:-}" && -n "${LON:-}" ]] &&
+      echo "Mode: Auto ($LAT, $LON)" ||
+      echo "Mode: Fixed ($DAWN_TIME - $DUSK_TIME)"
+    echo "Transition: $((TRANSITION_DURATION / 60)) min"
+    [[ -f "$PIDFILE" ]] && echo "PID: $(cat "$PIDFILE")"
+  else
+    echo "Night Shift: OFF"
+  fi
+}
+
+# --- rofi ---
+
+_rofi() {
+  local prompt="$1" n="$2"
+  shift 2
+  local -a cmd=(rofi -dmenu -p "$prompt")
+  [[ -f "$RASI_THEME" ]] && cmd+=(-theme "$RASI_THEME")
+  cmd+=(-theme-str "listview { lines: ${n}; }" "$@")
+  "${cmd[@]}" 2>/dev/null || true
+}
+
+menu() {
+  local prompt="$1" content="$2"
+  local rendered n
+  rendered=$(printf '%b' "$content")
+  n=$(printf '%s' "$rendered" | awk 'NF' | wc -l)
+  ((n < 1)) && n=1
+  ((n > MAX_LINES)) && n=$MAX_LINES
+  printf '%s\n' "$rendered" | _rofi "$prompt" "$n"
+}
+
+input_menu() {
+  local prompt="$1" default="$2"
+  local -a cmd=(rofi -dmenu -p "$prompt")
+  [[ -f "$RASI_THEME" ]] && cmd+=(-theme "$RASI_THEME")
+  cmd+=(-theme-str "listview { lines: 1; }")
+  printf '%s\n' "$default" | "${cmd[@]}" 2>/dev/null || true
+}
+
+# --- menus ---
+
+main_menu() {
+  source "$CONFIG_FILE"
+  local status_text
+  is_running && status_text="ON" || status_text="OFF"
+
+  local ch
+  ch=$(menu "Night Shift:" \
+    "$STATUS Status: $status_text\n\
+$TOGGLE On/Off\n\
+$TEMP Temp: ${DAY_TEMP}K / ${NIGHT_TEMP}K\n\
+$TIME Time: ${DAWN_TIME} - ${DUSK_TIME}\n\
+$DURATION Transition: $((TRANSITION_DURATION / 60)) min\n\
+$MODE Mode\n\
+$EXIT Exit")
+
+  case "$ch" in
+  *Exit* | "") exit 0 ;;
+  *On/Off*)
+    toggle
+    sleep 1
+    main_menu
+    ;;
+  *Temp*) temperature_menu ;;
+  *Time*) time_menu ;;
+  *Transition*) duration_menu ;;
+  *Mode*) mode_menu ;;
+  *) main_menu ;;
+  esac
+}
+
+temperature_menu() {
+  source "$CONFIG_FILE"
+  local ch
+  ch=$(menu "Temperature:" \
+    "$BACK Back\n\
+$TEMP Day: ${DAY_TEMP}K\n\
+$TEMP Night: ${NIGHT_TEMP}K\n\
+$SETTINGS Presets\n\
+$EXIT Exit")
+
+  case "$ch" in
+  *Exit* | "") exit 0 ;;
+  *Back*) main_menu ;;
+  *Day*)
+    local v
+    v=$(input_menu "Day temperature (K):" "$DAY_TEMP")
+    [[ -n "$v" && "$v" =~ ^[0-9]+$ ]] && set_setting "DAY_TEMP" "$v" &&
+      notify "Day: ${v}K" && restart_if_running
+    temperature_menu
+    ;;
+  *Night*)
+    local v
+    v=$(input_menu "Night temperature (K):" "$NIGHT_TEMP")
+    [[ -n "$v" && "$v" =~ ^[0-9]+$ ]] && set_setting "NIGHT_TEMP" "$v" &&
+      notify "Night: ${v}K" && restart_if_running
+    temperature_menu
+    ;;
+  *Presets*) preset_menu ;;
+  *) temperature_menu ;;
+  esac
+}
+
+preset_menu() {
+  local ch
+  ch=$(menu "Presets:" \
+    "$BACK Back\n\
+Neutral  (6000K / 4000K)\n\
+Default  (5500K / 3500K)\n\
+Warm     (5500K / 3300K)\n\
+Hot      (5500K / 3000K)\n\
+$EXIT Exit")
+
+  local day night
+  case "$ch" in
+  *Exit* | "") exit 0 ;;
+  *Back*) temperature_menu ;;
+  *Neutral*)
+    day=6000
+    night=4000
+    ;;
+  *Default*)
+    day=5500
+    night=3500
+    ;;
+  *Warm*)
+    day=5500
+    night=3300
+    ;;
+  *Hot*)
+    day=5500
+    night=3000
+    ;;
+  *)
+    preset_menu
+    return
+    ;;
+  esac
+  set_setting "DAY_TEMP" "$day"
+  set_setting "NIGHT_TEMP" "$night"
+  notify "Preset applied: ${day}K / ${night}K"
+  restart_if_running
+  sleep 0.5
+  main_menu
+}
+
+time_menu() {
+  source "$CONFIG_FILE"
+  local ch
+  ch=$(menu "Transition Times:" \
+    "$BACK Back\n\
+$TIME Dawn: ${DAWN_TIME}\n\
+$TIME Dusk: ${DUSK_TIME}\n\
+$EXIT Exit")
+
+  case "$ch" in
+  *Exit* | "") exit 0 ;;
+  *Back*) main_menu ;;
+  *Dawn*)
+    local v
+    v=$(input_menu "Dawn time (HH:MM):" "$DAWN_TIME")
+    [[ -n "$v" && "$v" =~ ^[0-9]{2}:[0-9]{2}$ ]] && set_setting "DAWN_TIME" "\"$v\"" &&
+      notify "Dawn: $v" && restart_if_running
+    time_menu
+    ;;
+  *Dusk*)
+    local v
+    v=$(input_menu "Dusk time (HH:MM):" "$DUSK_TIME")
+    [[ -n "$v" && "$v" =~ ^[0-9]{2}:[0-9]{2}$ ]] && set_setting "DUSK_TIME" "\"$v\"" &&
+      notify "Dusk: $v" && restart_if_running
+    time_menu
+    ;;
+  *) time_menu ;;
+  esac
+}
+
+duration_menu() {
+  source "$CONFIG_FILE"
+  local minutes=$((TRANSITION_DURATION / 60))
+  local ch
+  ch=$(menu "Transition Duration:" \
+    "$BACK Back\n\
+$DURATION Current: ${minutes} min\n\
+Short   (15 min)\n\
+Default (30 min)\n\
+Long    (45 min)\n\
+Extra   (60 min)\n\
+Manual\n\
+$EXIT Exit")
+
+  local secs
+  case "$ch" in
+  *Exit* | "") exit 0 ;;
+  *Back*) main_menu ;;
+  *Short*) secs=900 ;;
+  *Default*) secs=1800 ;;
+  *Long*) secs=2700 ;;
+  *Extra*) secs=3600 ;;
+  *Manual*)
+    local v
+    v=$(input_menu "Duration (minutes):" "$minutes")
+    [[ -n "$v" && "$v" =~ ^[0-9]+$ ]] && set_setting "TRANSITION_DURATION" "$((v * 60))" &&
+      notify "Transition: ${v} min" && restart_if_running
+    sleep 0.5
+    main_menu
+    return
+    ;;
+  *)
+    duration_menu
+    return
+    ;;
+  esac
+  set_setting "TRANSITION_DURATION" "$secs"
+  notify "Transition: $((secs / 60)) min"
+  restart_if_running
+  sleep 0.5
+  main_menu
+}
+
+mode_menu() {
+  source "$CONFIG_FILE"
+  local lat_val lon_val current_mode="Fixed"
+  lat_val=$(grep "^LAT=" "$CONFIG_FILE" | cut -d= -f2 | tr -d ' "' 2>/dev/null || true)
+  lon_val=$(grep "^LON=" "$CONFIG_FILE" | cut -d= -f2 | tr -d ' "' 2>/dev/null || true)
+  [[ -n "$lat_val" ]] && current_mode="Auto (${lat_val}, ${lon_val})"
+
+  local ch
+  ch=$(menu "Mode:" \
+    "$BACK Back\n\
+$MODE Current: $current_mode\n\
+Fixed mode\n\
+Auto mode\n\
+$EXIT Exit")
+
+  case "$ch" in
+  *Exit* | "") exit 0 ;;
+  *Back*) main_menu ;;
+  *Fixed*)
+    comment_setting "LAT"
+    comment_setting "LON"
+    notify "Mode: Fixed"
+    restart_if_running
+    sleep 0.5
+    main_menu
+    ;;
+  *Auto*)
+    local lat lon
+    lat=$(input_menu "Latitude:" "${lat_val:-53.9}")
+    [[ -z "$lat" ]] && mode_menu && return
+    lon=$(input_menu "Longitude:" "${lon_val:-27.6}")
+    [[ -z "$lon" ]] && mode_menu && return
+    set_setting "LAT" "\"$lat\""
+    set_setting "LON" "\"$lon\""
+    notify "Mode: Auto ($lat, $lon)"
+    restart_if_running
+    sleep 0.5
+    main_menu
+    ;;
+  *) mode_menu ;;
+  esac
+}
+
+# --- dispatch ---
+
+init_config
+
+# lock для backend команд
+backend_cmd=false
+case "${1:-}" in
+on | start | off | stop | toggle | restart | status) backend_cmd=true ;;
+esac
+
+if $backend_cmd; then
+  if [[ -f "$LOCKFILE" ]]; then
+    age=$(($(date +%s) - $(stat -c %Y "$LOCKFILE" 2>/dev/null || echo 0)))
+    [[ $age -lt 10 ]] && {
+      echo "Another instance is running" >&2
+      exit 0
+    }
+  fi
+  touch "$LOCKFILE"
+  trap 'rm -f "$LOCKFILE"' EXIT
+fi
+
+case "${1:-config}" in
+on | start) start_wlsunset ;;
+off | stop) stop_wlsunset ;;
+toggle) toggle ;;
+restart) restart ;;
+status) status ;;
+config | --config | -c) main_menu ;;
+*)
+  echo "Usage: $(basename "$0") {on|off|toggle|restart|status|config}"
+  exit 1
+  ;;
+esac
