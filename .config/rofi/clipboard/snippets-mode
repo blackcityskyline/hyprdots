@@ -1,30 +1,38 @@
 #!/bin/bash
-# Rofi script mode для сниппетов
-# ROFI_RETV=0  — показать список
-# ROFI_RETV=1  — выбран элемент → копировать
-# ROFI_RETV=2  — кастомный ввод: +text или +tag: text → добавить сниппет
-# ROFI_RETV=10 — ctrl+d → удалить сниппет
-# ROFI_RETV=11 — ctrl+e → открыть snippets.txt в редакторе
+# Rofi script mode — text snippets manager
+#
+# ROFI_RETV=0  — show list
+# ROFI_RETV=1  — entry selected → copy to clipboard
+# ROFI_RETV=2  — custom input: "+text" or "+tag: text" → add snippet
+# ROFI_RETV=10 — Ctrl+D → delete selected snippet
+# ROFI_RETV=11 — Ctrl+E → open snippets.txt in editor
 
 : "${TERMINAL:=alacritty}"
 : "${EDITOR_CMD:=nvim}"
+
 SNIPPETS_FILE="$HOME/.config/rofi/clipboard/snippets.txt"
 [ -f "$SNIPPETS_FILE" ] || touch "$SNIPPETS_FILE"
 
 if [ "$ROFI_RETV" = "0" ]; then
+    # Show hint and list all snippets
     echo "  + text  |  + tag: text"
     cat "$SNIPPETS_FILE"
 
 elif [ "$ROFI_RETV" = "2" ]; then
+    # Add new snippet (input must start with "+")
     if [[ "$1" == +* ]]; then
         INPUT=$(echo "${1:1}" | sed 's/^ *//')
+
         if [[ "$INPUT" =~ ^([a-zA-Z0-9_-]+):\ *(.+)$ ]]; then
+            # Tagged format: "+tag: text" → "[tag] text"
             TAG="${BASH_REMATCH[1]}"
             TEXT="${BASH_REMATCH[2]}"
             SNIPPET="[$TAG] $TEXT"
         else
+            # Plain format: "+text"
             SNIPPET="$INPUT"
         fi
+
         if [ -n "$SNIPPET" ]; then
             echo "$SNIPPET" >> "$SNIPPETS_FILE"
             echo -n "$SNIPPET" | wl-copy
@@ -32,16 +40,17 @@ elif [ "$ROFI_RETV" = "2" ]; then
     fi
 
 elif [ "$ROFI_RETV" = "1" ]; then
+    # Copy selected snippet to clipboard
     echo -n "$1" | wl-copy
 
 elif [ "$ROFI_RETV" = "10" ]; then
-    # Удалить выбранный сниппет
+    # Delete selected snippet from file
     ESCAPED=$(printf '%s\n' "$1" | sed 's/[[\.*^$()+?{|]/\\&/g')
     sed -i "/^${ESCAPED}$/d" "$SNIPPETS_FILE"
     echo "  + text  |  + tag: text"
     cat "$SNIPPETS_FILE"
 
 elif [ "$ROFI_RETV" = "11" ]; then
-    # Открыть snippets.txt в редакторе
+    # Open snippets file in terminal editor
     setsid "$TERMINAL" -e "$EDITOR_CMD" "$SNIPPETS_FILE" </dev/null >/dev/null 2>&1 &
 fi

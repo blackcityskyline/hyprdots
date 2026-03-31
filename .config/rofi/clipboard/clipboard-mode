@@ -1,8 +1,9 @@
 #!/bin/bash
-# Rofi script mode для клипборда
-# ROFI_RETV=0  — показать список
-# ROFI_RETV=1  — выбран элемент → декодировать и скопировать
-# ROFI_RETV=10 — ctrl+d → удалить из истории
+# Rofi script mode — clipboard history via cliphist
+#
+# ROFI_RETV=0  — show list
+# ROFI_RETV=1  — entry selected → decode and copy to clipboard
+# ROFI_RETV=10 — Ctrl+D → delete entry from history
 
 if [ "$ROFI_RETV" = "0" ]; then
     cliphist list

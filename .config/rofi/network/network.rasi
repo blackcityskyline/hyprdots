@@ -1,5 +1,10 @@
+/* ~/.config/rofi/network/network.rasi                  */
+/* Shared theme for WiFi and Bluetooth rofi menus       */
+/* Positioned top-right corner with offset from edge    */
+
 @import "../themes/tokyonight-night.rasi"
 
+/*****----- Main Window -----*****/
 window {
     width:            250px;
     border-radius:    12px;
@@ -13,6 +18,7 @@ window {
     y-offset:         15px;
 }
 
+/*****----- Main Box -----*****/
 mainbox {
     spacing:          8px;
     padding:          8px;
@@ -21,6 +27,7 @@ mainbox {
     children:         [ "inputbar", "listview" ];
 }
 
+/*****----- Inputbar -----*****/
 inputbar {
     spacing:          6px;
     padding:          8px;
@@ -41,14 +48,15 @@ textbox-prompt-colon {
 }
 
 entry {
-    background-color: inherit;
-    text-color:       inherit;
-    cursor:           text;
-    placeholder:      "";
+    background-color:  inherit;
+    text-color:        inherit;
+    cursor:            text;
+    placeholder:       "";
     placeholder-color: @foreground-dim;
-    expand:           true;
+    expand:            true;
 }
 
+/*****----- Listview -----*****/
 listview {
     columns:          1;
     lines:            10;
@@ -63,6 +71,7 @@ listview {
     border:           0;
 }
 
+/*****----- Elements -----*****/
 element {
     orientation:      horizontal;
     spacing:          0px;
@@ -89,6 +98,7 @@ element selected.normal  { background-color: @background-highlight; text-color: 
 element normal.urgent    { background-color: @background-visual;    text-color: @urgent;         }
 element selected.urgent  { background-color: @background-highlight; text-color: @urgent;         }
 
+/*****----- Error Message -----*****/
 error-message {
     padding:          15px;
     border-radius:    10px;

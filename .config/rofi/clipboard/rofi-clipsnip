@@ -1,1 +1,5 @@
-rofi -show clipboard -config ~/.config/rofi/clipboard/clipboard.rasi # Clipboard and snippets
+#!/bin/bash
+# Full clipboard + snippets interface (two-tab rofi mode)
+# Shift+Left / Shift+Right to switch between CLIPBOARD and SNIPPETS tabs
+
+rofi -show clipboard -config ~/.config/rofi/clipboard/clipboard.rasi

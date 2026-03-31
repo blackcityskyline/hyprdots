@@ -6,7 +6,7 @@ cover=/tmp/cover.png
 bkp_cover=~/.config/rofi/mediabox/music.jpg
 mpddir=~/media/Music
 terminal=foot
-roficonfig="$HOME/.config/rofi/media/mediabox.rasi"
+roficonfig="$HOME/.config/rofi/mediabox/mediabox.rasi"
 STATE_FILE="/tmp/rofi-media-state"
 
 # ── Entry point: if called directly — launch rofi in script mode ──────────────

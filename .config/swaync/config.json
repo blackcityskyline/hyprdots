@@ -42,9 +42,6 @@
   "widgets": [
     "buttons-grid",
     "mpris",
-    "volume",
-    "backlight",
-    "dnd",
     "notifications"
   ],
   "widget-config": {

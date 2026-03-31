@@ -87,7 +87,7 @@
     "format": "{}",
     "format-ru": "RU ",
     "format-en": "US ",
-    "on-click": "~/bin/hypr/switchxkblayout"
+    "on-click": "~/bin/hypr/hyprxkblayout"
     // "on-click": "hyprctl switchxkblayout at-translated-set-2-keyboard next"
   },
   
@@ -97,7 +97,7 @@
     "return-type": "json",
     "interval": 1,
     "on-click": "playerctl play-pause",
-    "on-click-right": "~/.config/rofi/media/rofi-media.sh",
+    "on-click-right": "~/.config/rofi/mediabox/rofi-mediabox",
     "on-scroll-up": "playerctl next",
     "on-scroll-down": "playerctl previous"
   },

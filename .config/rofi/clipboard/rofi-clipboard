@@ -1,6 +1,10 @@
 #!/bin/bash
+# Simple clipboard picker — dmenu mode (no snippets tab)
+# Use rofi-clipsnip for the full clipboard + snippets interface
+
 cliphist list | rofi -dmenu \
-  -config ~/.config/rofi/clipboard/clipboard.rasi \
-  -no-show-match \
-  -no-custom \
-  -i | cliphist decode | wl-copy
+    -config ~/.config/rofi/clipboard/clipboard.rasi \
+    -no-show-match \
+    -no-custom \
+    -i \
+    | cliphist decode | wl-copy
