@@ -1,26 +1,26 @@
 # ~/.bashrc
-# Запускаем только интерактивные сессии
+# Interactive sessions
 [[ $- != *i* ]] && return
 
-# ---------------------- История ----------------------
+# ------------------------- History -------------------------
 HISTSIZE=10000
 HISTFILESIZE=20000
 HISTCONTROL=ignoredups:erasedups
 shopt -s histappend
 PROMPT_COMMAND="history -a; history -c; history -r; ${PROMPT_COMMAND}"
 
-# ---------------------- Встроенные фишки bash ----------------------
+# ---------------------- Bash features ----------------------
 shopt -s autocd cdspell checkwinsize direxpand
 set -o noclobber
 
-# ---------------------- Алиасы (цвета и base-утилиты) ----------------------
+# ------------------------- Aliases -------------------------
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias diff='diff --color=auto'
 alias ip='ip -color=auto'
 
-# Замена ls -> eza (как в твоём fish)
+# ls -> eza
 if command -v eza &>/dev/null; then
   alias ls='eza -aG --color=always --icons'
   alias ll='eza -l --color=always --icons --group-directories-first'
@@ -33,16 +33,16 @@ else
   alias la='ls -A'
 fi
 
-# cat -> bat (если есть)
+# cat -> bat
 command -v bat &>/dev/null && alias cat='bat'
 
-# zoxide (инициализация для bash)
+# zoxide
 if command -v zoxide &>/dev/null; then
   eval "$(zoxide init bash)"
-  alias cd='z' # заменяем cd на zoxide, как в fish (осторожно: переопределяет встроенный cd)
+  alias cd='z' # replace z to cd
 fi
 
-# Повседневное
+# Common
 alias c='clear'
 alias h='history'
 alias j='jobs -l'
@@ -55,18 +55,18 @@ alias ff='fastfetch'
 alias pubip='curl ifconfig.me && echo ""'
 alias reload='source ~/.bashrc'
 
-# Навигация
+# Navigation
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .....='cd ../../../..'
 
-# Файлы и безопасность (mv/cp/rm с подтверждением)
+# Files (mv/cp/rm with confirm)
 alias mv='mv -i'
 alias cp='cp -i'
 alias rm='rm -i'
 
-# Распаковка всего (extract)
+# Extract
 extract() {
   if [ -f "$1" ]; then
     case "$1" in
@@ -81,17 +81,17 @@ extract() {
     *.zip) unzip "$1" ;;
     *.Z) uncompress "$1" ;;
     *.7z) 7z x "$1" ;;
-    *) echo "«${1}» нечем распаковать, брат." ;;
+    *) echo "«${1}» install any extractor" ;;
     esac
   else
-    echo "«${1}» — не файл."
+    echo "«${1}» — no such a file"
   fi
 }
 
-# ---------------------- Pacman / yay / paru (лаконично) ----------------------
+# ---------------------- Pacman / yay / paru ----------------------
 alias p='sudo pacman'
 alias y='yay'
-alias syu='yay -Syu' # основное обновление
+alias syu='yay -Syu'
 alias pacupg='sudo pacman -Syu'
 alias pacin='sudo pacman -S'
 alias pacre='sudo pacman -R'
@@ -117,7 +117,7 @@ alias yamir='yay -Syy'
 alias parin='paru -S'
 alias parupg='paru -Syu'
 
-# Системные утилиты (выборочно)
+# System utilities
 alias sctl='sudo systemctl'
 alias start='sudo systemctl start'
 alias stop='sudo systemctl stop'
@@ -130,12 +130,12 @@ alias lsblkk='lsblk -o NAME,FSTYPE,PARTLABEL,LABEL,MOUNTPOINT,TYPE,TRAN,SIZE,MOD
 alias lasterrors='journalctl -b -p err'
 alias vacuum="journalctl --vacuum-size=100M"
 
-# Редактор по умолчанию
+# Editor settings
 export EDITOR=nvim
 export VISUAL=nvim
 export SUDO_EDITOR=nvim
 
-# ---------------------- Промпт (твой, только переписан на bash) --------------
+# ---------------------- Prompt ----------------------
 RESET="\[\033[0m\]"
 BOLD="\[\033[1m\]"
 GREEN="\[\033[32m\]"
@@ -152,10 +152,17 @@ __git_prompt() {
 PS1="${GREEN}\u${RESET}@${YELLOW}\h${RESET}:${BLUE}\w${MAGENTA}\$(__git_prompt)${RESET}\n${BOLD}λ ${RESET}"
 export PS1
 
-# ---------------------- Окружение и мелочи ----------------------
+# ---------------------- Env & Misc ----------------------
 export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/bin/hypr:$PATH"
+export PATH="$HOME/bin/others:$PATH"
+export PATH="$HOME/bin/x11:$PATH"
+export PATH="$HOME/bin/waybar:$PATH"
+export PATH="$HOME/bin/swaync:$PATH"
+export PATH="$HOME/bin/fetchs:$PATH"
+export PATH="$HOME/bin/color-scripts/:$PATH"
 export LESS="-R"
-# man с подсветкой через bat (если bat есть)
+# man with bat
 command -v bat &>/dev/null && export MANPAGER="sh -c 'col -bx | bat -l man -p'" 2>/dev/null
 
 # mkdir + cd
@@ -168,7 +175,7 @@ elif [ -f /etc/bash_completion ]; then
   . /etc/bash_completion
 fi
 
-# ---------------------- Приветствие ----------------------
+# ---------------------- Greeting ----------------------
 if shopt -q login_shell; then
-  echo "I use Arch btw"
+  greeting
 fi
