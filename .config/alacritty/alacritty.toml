@@ -2,7 +2,8 @@
 live_config_reload = true
 working_directory = "None"
 import = [
-  "~/.config/alacritty/colorschemes/tokyonight.toml"
+  # "~/.config/alacritty/colorschemes/tokyonight.toml",
+  "~/.config/alacritty/themes/noctalia.toml",
 ]
 [terminal.shell]
 program = "/usr/bin/fish"
@@ -155,3 +156,8 @@ action = "IncreaseFontSize"
 key = "-"
 mods = "Control|Shift"
 action = "DecreaseFontSize"
+
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\u001B\r"

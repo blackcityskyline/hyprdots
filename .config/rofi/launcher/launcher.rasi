@@ -5,9 +5,9 @@
 configuration {
     modi:                       "drun,run,ssh";
     show-icons:                 true;
-    display-drun:               "APPS";
-    display-run:                "RUN";
-    display-ssh:                "SSH";
+    display-drun:               "󰣇";
+    display-run:                "";
+    display-ssh:                "󰌘";
     click-to-exit:              true;
     drun-display-format:        "{name}";
     matching:                   "fuzzy";

@@ -12,7 +12,6 @@
   "modules-left": [
     "custom/arch-launcher",
     "custom/waympris",
-    // "hyprland/window"
     "custom/waycpu",
     "hyprland/language"
   ],
@@ -69,20 +68,7 @@
     "all-outputs": true,
     "show-special": false
   },
-  
-  "hyprland/window": {
-    "format": "<span color='#7aa2f7'>  {title}</span>",
-    "max-length": 25,
-    "truncate": true,
-    "ellipsize": true,
-    "rewrite": {
-      "(.*) - Zen Browser": "🌎 $1",
-      "(.*) - fish": " [$1]",
-      "(.*) — Chromium": "🌐 $1",
-      "(.*) — Brave": "🦁 $1"
-    }
-  },
-  
+
   "hyprland/language": {
     "format": "{}",
     "format-ru": "RU ",

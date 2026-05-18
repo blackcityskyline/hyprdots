@@ -11,3 +11,14 @@ separator_open = ""
 separator_close = ""
 
 # preview, plugin, adapter set by default
+
+
+[plugin]
+prepend_preloaders = [
+    { mime = "{audio,video,image}/*", run = "/home/black/.local/state/yazi/packages/1b50b8803c781f0912040e651e305e71" },
+    { mime = "application/subrip", run = "/home/black/.local/state/yazi/packages/1b50b8803c781f0912040e651e305e71" },
+]
+
+prepend_previewers = [
+    { mime = "audio/*", run = "/home/black/.config/yazi/scripts/mediainfo-preview.sh" },
+]
