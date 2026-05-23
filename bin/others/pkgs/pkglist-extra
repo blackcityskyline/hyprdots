@@ -1,0 +1,245 @@
+# =============================================================================
+# pkglist-extra — wm/de окружение, приложения, tui утилиты
+# =============================================================================
+
+# ── wm / compositor ───────────────────────────────────────────────────────────
+hyprland
+bspwm
+oxwm-git             # aur
+sxhkd
+picom
+xsettingsd
+
+# ── hyprland экосистема ───────────────────────────────────────────────────────
+hyprlock
+hypridle
+hyprpolkitagent
+hyprcursor
+hyprland-guiutils
+hyprland-qt-support
+hyprshutdown
+python-pulsectl
+
+# ── окружение / бар / уведомления ────────────────────────────────────────────
+noctalia-shell
+waybar
+polybar
+dunst
+swaync
+swayosd
+wlogout
+wlsunset
+swaybg
+capitaine-cursors
+adwaita-colors-icon-theme
+breeze-icons
+
+# ── лаунчеры ─────────────────────────────────────────────────────────────────
+rofi
+wofi
+
+# ── clipboard / скриншоты ────────────────────────────────────────────────────
+wl-clipboard
+cliphist
+grim
+grimblast-git
+slurp
+wf-recorder
+wl-screenrec
+
+# ── темы / курсоры / шрифт ───────────────────────────────────────────────────────────
+capitaine-cursors
+tokyonight-gtk-theme-git  # aur
+kvantum
+qt5ct
+qt6ct
+nwg-look
+noto-fonts
+noto-fonts-emoji
+ttf-font-awesome
+
+# ── терминалы ─────────────────────────────────────────────────────────────────
+alacritty
+foot
+kitty
+
+# ── файловые менеджеры ────────────────────────────────────────────────────────
+vifm
+pcmanfm-gtk3
+
+# ── медиа управление ─────────────────────────────────────────────────────────
+playerctl
+python-mpris2
+
+# ── медиа  ────────────────────────────────────────────────────────────────────
+mpv
+mpv-mpris
+mpv-quality-menu-git
+subliminal 
+mediainfo
+vlc
+yt-dlp
+yt-dlp-ejs
+deno
+streamlink
+cava
+feh
+imv
+gwenview
+ffmpeg
+lutgen-bin
+youtube-tui-full-bin
+youtui
+gophertube-bin           # aur
+youtube-music
+subtui-git
+tera
+imagemagick
+
+# ── книги / документы ─────────────────────────────────────────────────────
+bookokrat-bin
+zathura
+hygg-git
+
+# ── пакетный менеджер ────────────────────────────────────────────────────
+octopi
+
+# ── аудио ────────────────────────────────────────────────────────────────
+pavucontrol
+wiremix              # aur
+helvum
+hyprpwcenter
+
+# ── мониторинг ───────────────────────────────────────────────────────────────
+neohtop-bin          # aur
+
+# ── сеть ─────────────────────────────────────────────────────────────────
+trippy
+gping
+impala               # aur
+gazelle-tui          # aur
+nmgui                # aur
+network-manager-applet
+blueman
+adw-bluetooth        # aur
+nm-connection-editor
+network-manager-applet
+
+# ── системные / полезные утилиты ────────────────────────────────────────────────────────
+asciinema
+tldr
+navi
+pastel
+tty-clock
+termscp
+coolercontrol        # aur
+hiddify-app-bin      # aur
+moonlight-qt
+iloader-bin          # aur
+ventoy-bin
+sunshine             # aur
+meld
+conky
+cachyos-packageinstaller
+scx-manager
+scx-tools
+scx-scheds
+gnome-keyring
+libsecret
+bitwarden
+keyd
+cpupower
+dsearch-bin
+haveged
+matugen
+sg3_utils
+rustup
+atuin
+jq
+tesseract
+zbar
+translate-shell
+udisks2
+
+
+# ── диски / торренты ─────────────────────────────────────────────────────────
+rtorrent
+caligula             # aur
+traxor               # aur
+deluge
+
+# ── органайзер / календарь ───────────────────────────────────────────────────
+calcurse
+calcure              # aur
+lotion               # aur
+
+# ── dev ──────────────────────────────────────────────────────────────
+lazygit
+sc-im
+binsider             # aur
+python
+lua
+lua-language-server
+luarocks
+nodejs
+pypy3-psutil
+python-beautifulsoup4
+python-lsp-server
+python-mpris2
+python-packaging
+python-pip
+yaml-language-server
+
+# ── гейминг ──────────────────────────────────────────────────────────────────
+heroic-games-launcher-bin  # aur
+goverlay
+mangohud
+protontricks
+wine
+winetricks
+
+# ── браузеры / мессенджеры ───────────────────────────────────────────────────
+zen-browser          # aur
+telegram-desktop
+gomuks               # aur
+profanity
+
+# ── tui / cli / развлечения ──────────────────────────────────────────────────────────
+pipes-rs-bin             # aur
+pipes.sh
+pipes.c
+unimatrix-git        # aur
+cmatrix
+cmatrix-neo-git
+smassh               # aur
+scope-tui            # aur
+maze-tui
+rsfrac
+sigye
+ttysvr
+chatterm
+twitch-tui
+fastfetch
+cpufetch
+figlet
+
+# ── дополнительные пакеты (cargo, aur) ────────────────────────────────────────────────────────
+cargo-seek
+cargo-update
+gyr
+dstl
+depot-rs
+traceview
+tplay
+rucola
+catnip
+chamber
+bbc-news-cli
+tracker
+television
+tenki
+arttime-git
+ytfzf
+jiffy-bin
+diskonaut
+parui

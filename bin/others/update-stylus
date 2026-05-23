@@ -1,0 +1,9 @@
+#!/bin/bash
+sed -i "s/@version.*/@version        $(date +%s)/" ~/.cache/noctalia/stylus.user.css
+touch ~/.cache/noctalia/stylus.update.flag
+
+if pgrep -f zen-browser >/dev/null; then
+  zen-browser "file:///home/black/.cache/noctalia/stylus.user.css" &
+fi
+
+notify-send "Noctalia" "Colors updated"

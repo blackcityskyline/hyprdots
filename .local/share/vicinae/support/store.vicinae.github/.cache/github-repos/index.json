@@ -1,0 +1,15 @@
+{
+  "revision": "1",
+  "keys": {
+    "REACT_QUERY_OFFLINE_CACHE": {
+      "size": 4632302
+    }
+  },
+  "lru": [
+    {
+      "key": "REACT_QUERY_OFFLINE_CACHE",
+      "lastUsedAt": 1779429075824
+    }
+  ],
+  "size": 4632302
+}

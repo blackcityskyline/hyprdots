@@ -1,0 +1,7 @@
+
+#!/usr/bin/env bash
+
+mpv https://youtube.com/playlist?list=PLOM7OLn3AZxt6qVd1MMtisnn8H8aZ3wDG&si=HpId1_qYm04ybzV2 & disown
+
+
+

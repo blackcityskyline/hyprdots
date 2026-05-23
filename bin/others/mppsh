@@ -1,0 +1,28 @@
+#!/bin/bash
+# mpv wrapper
+
+show_status=false
+
+# check status
+if [[ "$1" == "-s" || "$1" == "--status" ]]; then
+  show_status=true
+  shift
+fi
+
+# check url
+if [[ $# -eq 0 ]]; then
+  echo "Usage: mpp [-s|--status] <URL> [mpv options]"
+  exit 1
+fi
+
+url="$1"
+shift
+
+# status visibility
+mpv_opts=""
+if [[ "$show_status" == false ]]; then
+  mpv_opts="--msg-level=statusline=no"
+fi
+
+# fish compat
+setsid mpv $mpv_opts "$url" "$@" &

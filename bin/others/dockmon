@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+SOCK=/tmp/docker-gaia.sock
+
+if ! pgrep -f "$SOCK" >/dev/null; then
+  ssh -fN \
+    -L $SOCK:/var/run/docker.sock \
+    black@2.27.11.153 \
+    -p 7331
+fi
+
+kitty -e env DOCKER_HOST=unix://$SOCK lazydocker

@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+# Cache cleanup script
+
+LOG="$HOME/.cache/log/cache-clean.log"
+mkdir -p "$(dirname "$LOG")"
+
+clean() { rm -rf "$@" 2>/dev/null; }
+
+# --- pacman / AUR ---
+pacman -Sc --noconfirm 2>/dev/null
+clean ~/.cache/paru
+
+# --- orphan packages ---
+orphans=$(pacman -Qdtq 2>/dev/null)
+if [[ -n "$orphans" ]]; then
+  pacman -Rns $orphans --noconfirm 2>/dev/null
+  echo "🗑️ $(date): Orphans removed: $orphans" >>"$LOG"
+fi
+
+# --- languages / build tools ---
+clean ~/.cache/go*
+# clean ~/go
+clean ~/.cargo/registry/*
+clean ~/.rustup/tmp/*
+clean ~/.cmake-js
+clean ~/.npm*
+clean ~/.local/share/pip
+clean ~/.cache/pip
+clean ~/.cache/node-gyp
+clean ~/.cache/yarn
+
+# --- browsers ---
+# clean ~/.mozilla
+clean ~/.waterfox
+clean ~/.var
+clean ~/.pki
+clean ~/.ytmusic
+clean ~/.tor-browser
+clean ~/.tor-browser
+
+# --- misc ---
+clean ~/.nv
+clean ~/.openjfx
+clean ~/.thunderbird
+clean ~/.ooniprobe
+clean ~/.java
+clean ~/.config/google-chrome
+clean ~/.config/com.add*
+clean ~/.config/microsoft*
+# clean ~/.config/go
+clean ~/.config/vivaldi
+clean ~/.config/google-chrome
+clean ~/.config/procps
+clean ~/.config/chromium
+
+# --- system logs ---
+journalctl --vacuum-time=3d 2>/dev/null
+
+echo "🧹 $(date): Cache cleaned" >>"$LOG"

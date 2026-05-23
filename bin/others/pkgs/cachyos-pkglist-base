@@ -1,0 +1,18 @@
+# =============================================================================
+# cachyos-packages-base — CachyOS пакеты для базовой системы
+# =============================================================================
+
+cachyos-keyring
+cachyos-mirrorlist
+cachyos-settings
+cachyos-rate-mirrors
+cachyos-hooks
+cachyos-kernel-manager
+cachyos-ananicy-rules
+cachyos-snapper-support
+linux-cachyos
+linux-cachyos-headers
+linux-cachyos-lts
+linux-cachyos-lts-headers
+mkinitcpio
+mkinitcpio-busybox

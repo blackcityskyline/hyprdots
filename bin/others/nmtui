@@ -1,0 +1,24 @@
+#!/bin/bash
+# Альтернативная Tokyonight Dark схема
+export NEWT_COLORS='
+root=black,black
+window=black,black
+shadow=black,black
+border=blue,black
+title=yellow,black
+textbox=white,black
+label=blue,black
+button=black,blue
+actbutton=white,blue
+compactbutton=blue,black
+checkbox=green,black
+actcheckbox=black,green
+entry=white,black
+disentry=gray,black
+listbox=white,black
+actlistbox=black,blue
+sellistbox=black,white
+actsellistbox=black,white
+'
+
+/usr/bin/nmtui "$@"

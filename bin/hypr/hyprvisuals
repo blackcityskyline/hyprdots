@@ -1,0 +1,40 @@
+#!/bin/bash
+# hyprvisuals — toggle blur/shadows/animations/dim/opacity
+# Usage: hyprvisuals [on|off|toggle|--status|--restore]
+
+STATE_FILE="$HOME/.cache/hyprvisuals"
+
+BLUR_ON=true
+SHADOW_ON=true
+ANIMATIONS_ON=true
+DIM_INACTIVE_ON=true
+DIM_STRENGTH=0.08
+DIM_SPECIAL=0.3
+DIM_AROUND=0.5
+ACTIVE_OPACITY=0.98
+INACTIVE_OPACITY=0.92
+
+disable_visuals() {
+    hyprctl eval 'hl.config({ animations = { enabled = false }, decoration = { blur = { enabled = false }, shadow = { enabled = false }, dim_inactive = false, dim_strength = 0, dim_special = 0, dim_around = 0, active_opacity = 1.0, inactive_opacity = 1.0 } })'
+    touch "$STATE_FILE"
+    notify-send -i system-run "Visuals disabled"
+}
+
+enable_visuals() {
+    hyprctl eval "hl.config({ animations = { enabled = $ANIMATIONS_ON }, decoration = { blur = { enabled = $BLUR_ON }, shadow = { enabled = $SHADOW_ON }, dim_inactive = $DIM_INACTIVE_ON, dim_strength = $DIM_STRENGTH, dim_special = $DIM_SPECIAL, dim_around = $DIM_AROUND, active_opacity = $ACTIVE_OPACITY, inactive_opacity = $INACTIVE_OPACITY } })"
+    rm -f "$STATE_FILE"
+    notify-send -i preferences-desktop-display "Visuals enabled"
+}
+
+case "$1" in
+--status)  [ -f "$STATE_FILE" ] && echo false || echo true ;;
+--restore) [ -f "$STATE_FILE" ] && disable_visuals ;;
+on)        enable_visuals ;;
+off)       disable_visuals ;;
+toggle|"")
+    if [ -f "$STATE_FILE" ]; then
+        enable_visuals
+    else
+        disable_visuals
+    fi ;;
+esac

@@ -1,0 +1,39 @@
+[config]
+
+[templates.stylus]
+input_path = "~/.config/noctalia/templates/zen-pages.css"
+output_path = "~/.cache/noctalia/stylus.user.css"
+
+[templates.nvim]
+input_path = "~/.config/noctalia/templates/nvim-theme.lua"
+output_path = "~/.config/nvim/colors/noctalia.lua"
+
+[templates.firefox-overlay]
+type = "json"
+path = "~/.cache/noctalia/firefox-colors.json"
+template = """
+{
+    "primary": "#{{colors.primary.default.hex}}",
+    "background": "#{{colors.background.default.hex}}"
+}
+"""
+[templates.fish-prompt]
+input_path = "~/.config/noctalia/templates/fish-prompt.fish"
+output_path = "~/.config/fish/functions/fish_prompt.fish"
+post_hook = "fish -c 'source ~/.config/fish/functions/fish_prompt.fish'"
+
+# [templates]
+
+# User-defined templates
+# Add your custom templates below
+# Example:
+# [templates.myapp]
+# input_path = "~/.config/noctalia/templates/myapp.css"
+# output_path = "~/.config/myapp/theme.css"
+# post_hook = "myapp --reload-theme"
+
+# Remove this section and add your own templates
+#[templates.placeholder]
+#input_path = "/etc/xdg/quickshell/noctalia-shell/Assets/Templates/noctalia.json"
+#output_path = "/home/black/.cache/noctalia/placeholder.json"
+

@@ -1,0 +1,15 @@
+{
+  "revision": "1",
+  "keys": {
+    "customDownloadsFolder": {
+      "size": 21
+    }
+  },
+  "lru": [
+    {
+      "key": "customDownloadsFolder",
+      "lastUsedAt": 1779487541561
+    }
+  ],
+  "size": 21
+}

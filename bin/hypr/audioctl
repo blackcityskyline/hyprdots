@@ -1,0 +1,447 @@
+#!/usr/bin/env python3
+"""
+audioctl — Control volume and sinks in Hyprland
+Commands: up | down | mute | sink-next | source-next |
+         sink <n|name> | source <n|name> | sink-all <up|down|mute> |
+         app <name> <sink> | group [i j ..] | group restore |
+         ungroup | save | restore | list
+"""
+
+import sys
+import os
+import subprocess
+from pathlib import Path
+
+import pulsectl
+
+# ── State files ────────────────────────────────────────────────────────────────
+
+GROUP_MODULE_FILE = Path("/tmp/audio_group_module")
+GROUP_SLAVES_FILE = Path("/tmp/audio_group_slaves")
+RESTORE_FILE = Path.home() / ".local/share/audio_restore"
+
+STEP = 2  # volume step (%) for up/down and sink-all
+
+# ── Helpers ────────────────────────────────────────────────────────────────────
+
+
+def notify(summary: str, body: str = "") -> None:
+    args = ["notify-send", summary]
+    if body:
+        args.append(body)
+    subprocess.run(args, check=False)
+
+
+def swayosd(*args: str) -> None:
+    """Show an OSD notification. Does not control volume or brightness itself."""
+    subprocess.run(["swayosd-client", *args], check=False)
+
+
+def die(msg: str, code: int = 1) -> None:
+    print(msg, file=sys.stderr)
+    sys.exit(code)
+
+
+def real_sinks(pulse: pulsectl.Pulse) -> list:
+    """All sinks except ScreencastMix and group."""
+    return [
+        s
+        for s in pulse.sink_list()
+        if "ScreencastMix" not in s.name and "group" not in s.name
+    ]
+
+
+def real_sources(pulse: pulsectl.Pulse) -> list:
+    """All sources except monitors."""
+    return [s for s in pulse.source_list() if ".monitor" not in s.name]
+
+
+def group_slave_names() -> list[str]:
+    """Names of sinks currently in the group."""
+    if GROUP_SLAVES_FILE.exists():
+        return [l for l in GROUP_SLAVES_FILE.read_text().splitlines() if l]
+    return []
+
+
+def free_sinks(pulse: pulsectl.Pulse) -> list:
+    """Sinks not belonging to a group."""
+    slaves = set(group_slave_names())
+    return [s for s in real_sinks(pulse) if s.name not in slaves]
+
+
+# ── set_sink / set_source ──────────────────────────────────────────────────────
+
+
+def set_sink(pulse: pulsectl.Pulse, name: str) -> None:
+    """Switch the default sink and move all active streams to it."""
+    try:
+        sink = pulse.get_sink_by_name(name)
+    except pulsectl.PulseIndexError:
+        notify("Audio", f"Sink not found: {name}")
+        die(f"Sink not found: {name}")
+
+    inputs = [
+        i
+        for i in pulse.sink_input_list()
+        if i.proplist.get("application.name") != "group output"
+    ]
+    for inp in inputs:
+        try:
+            pulse.sink_input_move(inp.index, sink.index)
+        except pulsectl.PulseOperationFailed:
+            pass  # stream may have ended during iteration
+
+    pulse.sink_default_set(sink)
+
+
+def set_source(pulse: pulsectl.Pulse, name: str) -> None:
+    try:
+        source = pulse.get_source_by_name(name)
+    except pulsectl.PulseIndexError:
+        notify("Audio", f"Source not found: {name}")
+        die(f"Source not found: {name}")
+    pulse.source_default_set(source)
+
+
+# ── Commands ───────────────────────────────────────────────────────────────────
+
+
+def cmd_up(pulse: pulsectl.Pulse) -> None:
+    sink = pulse.sink_default_get()
+    new_vol = pulse.volume_get_all_chans(sink) + STEP / 100
+    pulse.volume_set_all_chans(sink, new_vol)
+    swayosd("--output-volume", str(round(new_vol * 100)))
+
+
+def cmd_down(pulse: pulsectl.Pulse) -> None:
+    sink = pulse.sink_default_get()
+    new_vol = max(0.0, pulse.volume_get_all_chans(sink) - STEP / 100)
+    pulse.volume_set_all_chans(sink, new_vol)
+    swayosd("--output-volume", str(round(new_vol * 100)))
+
+
+def cmd_mute(pulse: pulsectl.Pulse) -> None:
+    sink = pulse.sink_default_get()
+    pulse.sink_mute(sink.index, not sink.mute)
+    swayosd("--output-volume", "mute-toggle")
+
+
+def cmd_sink_next(pulse: pulsectl.Pulse) -> None:
+    if GROUP_MODULE_FILE.exists():
+        candidates = [s.name for s in free_sinks(pulse)] + ["group"]
+    else:
+        candidates = [s.name for s in real_sinks(pulse)]
+
+    if not candidates:
+        notify("Audio", "No sinks available")
+        return
+
+    cur = pulse.sink_default_get().name
+    try:
+        idx = candidates.index(cur)
+        nxt = candidates[(idx + 1) % len(candidates)]
+    except ValueError:
+        nxt = candidates[0]
+
+    set_sink(pulse, nxt)
+    notify("Audio", nxt)
+
+
+def cmd_source_next(pulse: pulsectl.Pulse) -> None:
+    candidates = [s.name for s in real_sources(pulse)]
+    if not candidates:
+        notify("Audio", "No sources available")
+        return
+
+    cur = pulse.source_default_get().name
+    try:
+        idx = candidates.index(cur)
+        nxt = candidates[(idx + 1) % len(candidates)]
+    except ValueError:
+        nxt = candidates[0]
+
+    set_source(pulse, nxt)
+    notify("Audio (source)", nxt)
+
+
+def resolve_sink(pulse: pulsectl.Pulse, arg: str) -> str:
+    """Resolve a 0-based index or name to a sink name."""
+    if arg.isdigit():
+        sinks = real_sinks(pulse)
+        idx = int(arg)
+        if idx >= len(sinks):
+            die(f"Sink index out of range: {arg}")
+        return sinks[idx].name
+    return arg
+
+
+def resolve_source(pulse: pulsectl.Pulse, arg: str) -> str:
+    """Resolve a 0-based index or name to a source name."""
+    if arg.isdigit():
+        sources = real_sources(pulse)
+        idx = int(arg)
+        if idx >= len(sources):
+            die(f"Source index out of range: {arg}")
+        return sources[idx].name
+    return arg
+
+
+def cmd_sink(pulse: pulsectl.Pulse, arg: str) -> None:
+    name = resolve_sink(pulse, arg)
+    set_sink(pulse, name)
+    notify("Audio", name)
+
+
+def cmd_source(pulse: pulsectl.Pulse, arg: str) -> None:
+    name = resolve_source(pulse, arg)
+    set_source(pulse, name)
+    notify("Audio (source)", name)
+
+
+def cmd_sink_all(pulse: pulsectl.Pulse, action: str) -> None:
+    for sink in real_sinks(pulse):
+        vol = pulse.volume_get_all_chans(sink)
+        if action == "up":
+            pulse.volume_set_all_chans(sink, vol + STEP / 100)
+        elif action == "down":
+            pulse.volume_set_all_chans(sink, max(0.0, vol - STEP / 100))
+        elif action == "mute":
+            pulse.sink_mute(sink.index, not sink.mute)
+
+    # Show OSD based on the default sink
+    default = pulse.sink_default_get()
+    if action in ("up", "down"):
+        swayosd("--output-volume", str(round(pulse.volume_get_all_chans(default) * 100)))
+    elif action == "mute":
+        swayosd("--output-volume", "mute-toggle")
+
+
+def cmd_app(pulse: pulsectl.Pulse, app_name: str, sink_arg: str) -> None:
+    sink_name = resolve_sink(pulse, sink_arg)
+
+    try:
+        sink = pulse.get_sink_by_name(sink_name)
+    except pulsectl.PulseIndexError:
+        die(f"Sink not found: {sink_name}")
+
+    matched = [
+        i
+        for i in pulse.sink_input_list()
+        if i.proplist.get("application.name") == app_name
+    ]
+    if not matched:
+        die(f"App not found: {app_name}")
+
+    for inp in matched:
+        pulse.sink_input_move(inp.index, sink.index)
+
+    notify("Audio", f"{app_name} → {sink_name}")
+
+
+def cmd_group(pulse: pulsectl.Pulse, args: list[str]) -> None:
+    if not args:
+        print("Available sinks:")
+        for i, s in enumerate(real_sinks(pulse)):
+            print(f"  [{i}] {s.name}")
+        print()
+        print("Usage: audioctl group 0 1")
+        print("       audioctl group restore")
+        return
+
+    if args[0] == "restore":
+        if not GROUP_SLAVES_FILE.exists():
+            die("No saved group")
+        if GROUP_MODULE_FILE.exists():
+            die("Already grouped. Run ungroup first.")
+
+        slaves = ",".join(group_slave_names())
+        RESTORE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        RESTORE_FILE.write_text(pulse.sink_default_get().name)
+
+        mod_id = pulse.module_load(
+            "module-combine-sink", f"sink_name=group slaves={slaves}"
+        )
+        GROUP_MODULE_FILE.write_text(str(mod_id))
+        set_sink(pulse, "group")
+        notify("Audio", f"Group restored: {slaves}")
+        return
+
+    if GROUP_MODULE_FILE.exists():
+        die("Already grouped. Run ungroup first.")
+
+    all_sinks = real_sinks(pulse)
+    selected = []
+    for idx_str in args:
+        if not idx_str.isdigit():
+            die(f"Expected sink index, got: {idx_str}")
+        idx = int(idx_str)
+        if idx >= len(all_sinks):
+            die(f"Sink index out of range: {idx}")
+        selected.append(all_sinks[idx].name)
+
+    if not selected:
+        die("No valid sinks selected")
+
+    slaves = ",".join(selected)
+    RESTORE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    RESTORE_FILE.write_text(pulse.sink_default_get().name)
+
+    mod_id = pulse.module_load(
+        "module-combine-sink", f"sink_name=group slaves={slaves}"
+    )
+    GROUP_MODULE_FILE.write_text(str(mod_id))
+    GROUP_SLAVES_FILE.write_text("\n".join(selected) + "\n")
+
+    set_sink(pulse, "group")
+    notify("Audio", f"Group: {slaves}")
+    print(f"Group: {slaves}")
+
+
+def cmd_ungroup(pulse: pulsectl.Pulse) -> None:
+    if not GROUP_MODULE_FILE.exists():
+        die("No grouped sink active")
+
+    mod_id = int(GROUP_MODULE_FILE.read_text().strip())
+    pulse.module_unload(mod_id)
+    GROUP_MODULE_FILE.unlink(missing_ok=True)
+
+    fallback = real_sinks(pulse)
+    fallback_name = fallback[0].name if fallback else None
+
+    if RESTORE_FILE.exists():
+        saved = RESTORE_FILE.read_text().strip()
+        try:
+            set_sink(pulse, saved)
+        except SystemExit:
+            if fallback_name:
+                set_sink(pulse, fallback_name)
+    elif fallback_name:
+        set_sink(pulse, fallback_name)
+
+    notify("Audio", "Group removed")
+
+
+def cmd_save(pulse: pulsectl.Pulse) -> None:
+    RESTORE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    name = pulse.sink_default_get().name
+    RESTORE_FILE.write_text(name)
+    print(f"Saved: {name}")
+
+
+def cmd_restore(pulse: pulsectl.Pulse) -> None:
+    if not RESTORE_FILE.exists():
+        die("No restore point saved")
+    name = RESTORE_FILE.read_text().strip()
+    set_sink(pulse, name)
+    notify("Audio", f"Restored: {name}")
+
+
+def cmd_list(pulse: pulsectl.Pulse) -> None:
+    default_sink = pulse.sink_default_get().name
+    default_source = pulse.source_default_get().name
+
+    print("Output (Sink):")
+    for s in real_sinks(pulse):
+        vol = round(pulse.volume_get_all_chans(s) * 100)
+        muted = " [MUTED]" if s.mute else ""
+        marker = "→" if s.name == default_sink else " "
+        print(f"  {marker} {s.name} ({vol}%{muted})")
+
+    print()
+    print("Input (Source):")
+    for s in real_sources(pulse):
+        vol = round(pulse.volume_get_all_chans(s) * 100)
+        muted = " [MUTED]" if s.mute else ""
+        marker = "→" if s.name == default_source else " "
+        print(f"  {marker} {s.name} ({vol}%{muted})")
+
+    print()
+    print("Streams:")
+    for inp in pulse.sink_input_list():
+        app = inp.proplist.get("application.name", "?")
+        media = inp.proplist.get("media.name", "")
+        vol = round(pulse.volume_get_all_chans(inp) * 100)
+        line = f"  {app} ({vol}%)"
+        if media:
+            line += f" — {media}"
+        print(line)
+
+    if GROUP_MODULE_FILE.exists():
+        slaves = ", ".join(group_slave_names())
+        print()
+        print(f"⚡ Group active: {slaves}")
+
+
+# ── Entry point ────────────────────────────────────────────────────────────────
+
+USAGE = (
+    "up | down | mute | sink-next | source-next | "
+    "sink-all <up|down|mute> | sink <n|name> | source <n|name> | "
+    "app <name> <sink> | group [i j ..] | group restore | "
+    "ungroup | save | restore | list"
+)
+
+
+def main() -> None:
+    if len(sys.argv) < 2:
+        die(f"Usage: {os.path.basename(sys.argv[0])} {USAGE}")
+
+    cmd = sys.argv[1]
+
+    with pulsectl.Pulse("audioctl") as pulse:
+        if cmd == "up":
+            cmd_up(pulse)
+
+        elif cmd == "down":
+            cmd_down(pulse)
+
+        elif cmd == "mute":
+            cmd_mute(pulse)
+
+        elif cmd == "sink-next":
+            cmd_sink_next(pulse)
+
+        elif cmd in ("source-next", "next-source"):
+            cmd_source_next(pulse)
+
+        elif cmd == "sink":
+            if len(sys.argv) < 3:
+                die("Usage: audioctl sink <index|name>")
+            cmd_sink(pulse, sys.argv[2])
+
+        elif cmd == "source":
+            if len(sys.argv) < 3:
+                die("Usage: audioctl source <index|name>")
+            cmd_source(pulse, sys.argv[2])
+
+        elif cmd == "sink-all":
+            if len(sys.argv) < 3 or sys.argv[2] not in ("up", "down", "mute"):
+                die("Usage: audioctl sink-all <up|down|mute>")
+            cmd_sink_all(pulse, sys.argv[2])
+
+        elif cmd == "app":
+            if len(sys.argv) < 4:
+                die("Usage: audioctl app <name> <sink_index|sink_name>")
+            cmd_app(pulse, sys.argv[2], sys.argv[3])
+
+        elif cmd == "group":
+            cmd_group(pulse, sys.argv[2:])
+
+        elif cmd == "ungroup":
+            cmd_ungroup(pulse)
+
+        elif cmd == "save":
+            cmd_save(pulse)
+
+        elif cmd == "restore":
+            cmd_restore(pulse)
+
+        elif cmd == "list":
+            cmd_list(pulse)
+
+        else:
+            die(f"Unknown command: {cmd}\nUsage: audioctl {USAGE}")
+
+
+if __name__ == "__main__":
+    main()

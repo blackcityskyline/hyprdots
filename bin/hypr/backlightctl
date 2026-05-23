@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+# Brightness control: up | down | saver
+
+BACKLIGHT=$(ls /sys/class/backlight 2>/dev/null | head -1)
+[[ -z "$BACKLIGHT" ]] && echo "No backlight device found" >&2 && exit 1
+BACKLIGHT="/sys/class/backlight/$BACKLIGHT"
+
+CACHE="/tmp/brightness_saved"
+
+max=$(cat "$BACKLIGHT/max_brightness")
+cur=$(cat "$BACKLIGHT/brightness")
+
+step=$((max / 40))
+((step < 1)) && step=1
+
+set_brightness() {
+  local val=$1
+  ((val < 1)) && val=1
+  ((val > max)) && val=$max
+  echo "$val" >"$BACKLIGHT/brightness"
+  # swayosd только для показа OSD
+  swayosd-client --brightness $((val * 100 / max)) 2>/dev/null || true
+}
+
+write_zero() {
+  echo 0 >"$BACKLIGHT/brightness"
+  swayosd-client --brightness 0 2>/dev/null || true
+}
+
+case "$1" in
+up)
+  if ((cur == 0)); then
+    saved=$(cat "$CACHE" 2>/dev/null)
+    if [[ "$saved" =~ ^[0-9]+$ ]] && ((saved > 0 && saved <= max)); then
+      set_brightness "$saved"
+    else
+      set_brightness "$step"
+    fi
+  else
+    set_brightness $((cur + step))
+  fi
+  ;;
+
+down)
+  new=$((cur - step))
+  if ((new <= 0)); then
+    echo "$cur" >"$CACHE"
+    write_zero
+  else
+    set_brightness "$new"
+  fi
+  ;;
+
+saver)
+  if ((cur > 0)); then
+    echo "$cur" >"$CACHE"
+    write_zero
+  else
+    saved=$(cat "$CACHE" 2>/dev/null)
+    if [[ "$saved" =~ ^[0-9]+$ ]] && ((saved > 0 && saved <= max)); then
+      set_brightness "$saved"
+    else
+      set_brightness "$max" # FIX: fallback на max, не на пустую строку
+    fi
+  fi
+  ;;
+
+*)
+  echo "Usage: $(basename "$0") up | down | saver"
+  exit 1
+  ;;
+esac

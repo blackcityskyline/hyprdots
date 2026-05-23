@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cp ~/.zen/1pstlpwy.black/chrome/userChrome.bak ~/.zen/1pstlpwy.black/chrome/userChrome.css 
+cp ~/.zen/1pstlpwy.black/chrome/userContent.bak ~/.zen/1pstlpwy.black/chrome/userContent.css

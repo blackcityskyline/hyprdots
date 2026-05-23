@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# $HOME/bin/swaybg-random
+# Put wallpaper.timer to $HOME/.config/systemd/user/
+WALLPAPER_DIR="$HOME/Pictures/wallpapers/tokyonight-night/"
+CURRENT_WALLPAPER_FILE="$HOME/.cache/current_wallpaper.txt"
+
+# Check directory
+if [ ! -d "$WALLPAPER_DIR" ]; then
+  echo "Directory $WALLPAPER_DIR does not exist!" >&2
+  exit 1
+fi
+
+# Search for wallpaper
+wallpaper=$(find "$WALLPAPER_DIR" -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" -o -name "*.webp" \) 2>/dev/null | shuf -n 1)
+
+if [ -z "$wallpaper" ]; then
+  echo "No wallpapers found in $WALLPAPER_DIR" >&2
+  exit 1
+fi
+
+# Kill duplicates
+pkill swaybg 2>/dev/null
+
+# Set new wallpaper
+swaybg -i "$wallpaper" -m fill &

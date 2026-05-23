@@ -1,0 +1,119 @@
+/* ==UserStyle==
+@name           noctalia
+@namespace      local
+@version        1.0.0
+==/UserStyle== */
+
+@-moz-document url-prefix("http://"), url-prefix("https://") {
+  :root, html {
+    background-color: {{colors.surface.default.hex}} !important;
+    color: {{colors.on_surface.default.hex}} !important;
+  }
+
+  body {
+    background-color: {{colors.surface.default.hex}} !important;
+    color: {{colors.on_surface.default.hex}} !important;
+  }
+
+  a:link {
+    color: {{colors.primary.default.hex}} !important;
+  }
+
+  a:visited {
+    color: {{colors.tertiary.default.hex}} !important;
+  }
+}
+
+@-moz-document domain("youtube.com") {
+  :root {
+    --yt-spec-base-background: {{colors.surface.default.hex}} !important;
+    --yt-spec-raised-background: {{colors.surface_variant.default.hex}} !important;
+    --yt-spec-menu-background: {{colors.surface_variant.default.hex}} !important;
+    --yt-spec-text-primary: {{colors.on_surface.default.hex}} !important;
+    --yt-spec-text-secondary: {{colors.on_surface_variant.default.hex}} !important;
+    --yt-spec-call-to-action: {{colors.primary.default.hex}} !important;
+    --yt-spec-brand-link-text: {{colors.primary.default.hex}} !important;
+  }
+}
+
+@-moz-document domain("github.com") {
+  [data-color-mode="dark"],
+  [data-color-mode="light"],
+  [data-color-mode="auto"] {
+    --color-canvas-default: #1f0f0d !important;
+    --color-canvas-subtle: #5c403b !important;
+    --color-canvas-inset: #5c403b !important;
+    --color-fg-default: #fbdcd6 !important;
+    --color-fg-muted: #e5beb7 !important;
+    --color-accent-fg: #ffb4a7 !important;
+    --color-border-default: #ac8982 !important;
+    background-color: #1f0f0d !important;
+    color: #fbdcd6 !important;
+  }
+}
+
+@-moz-document domain("rutracker.org") {
+  html, body, div, span, td, th, p, li, label,
+  table, tr, option, optgroup, fieldset,
+  #page_container, #page_content, #main_content, #main_content_wrap,
+  .category, .row1, .row2, .row3, .row4, .forums,
+  #sidebar1, #sidebar1_wrap, #idx-sidebar2,
+  #latest_news, .sb2-block, #board_stats_wrap,
+  #main-nav, .topmenu, .menu-sub,
+  tr[style], td[style], #page_footer,
+  #page, #wrap, #page_wrap {
+    background-color: {{colors.surface.default.hex}} !important;
+    color: {{colors.on_surface.default.hex}} !important;
+    border-color: {{colors.outline.default.hex}} !important;
+  }
+
+  tr:hover td, tr:hover th,
+  tr:hover, *:hover {
+    background-color: {{colors.surface.default.hex}} !important;
+  }
+
+  span[style*="background"] {
+    background-color: {{colors.surface.default.hex}} !important;
+    color: {{colors.on_surface.default.hex}} !important;
+    border-color: {{colors.outline.default.hex}} !important;
+  }
+
+  input[type="text"], input[type="submit"],
+  select, textarea, .btn, button, input[type="button"] {
+    background-color: {{colors.surface.default.hex}} !important;
+    color: {{colors.on_surface.default.hex}} !important;
+    border-color: {{colors.outline.default.hex}} !important;
+  }
+
+  a:not([style*="color"]) {
+    color: {{colors.primary.default.hex}} !important;
+  }
+
+  img {
+    opacity: 0.9;
+  }
+}
+
+@-moz-document domain("claude.ai") {
+  :root {
+    color-scheme: dark;
+  }
+
+  body, html,
+  [class*="bg-bg-"],
+  [class*="bg-surface"],
+  [class*="sidebar"],
+  [class*="Sidebar"],
+  [class*="panel"],
+  [class*="Panel"] {
+    background-color: {{colors.surface.default.hex}} !important;
+    color: {{colors.on_surface.default.hex}} !important;
+  }
+
+  [class*="gradient"],
+  [class*="Gradient"],
+  [style*="gradient"] {
+    background: {{colors.surface.default.hex}} !important;
+  }
+}
+

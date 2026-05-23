@@ -1,0 +1,13 @@
+#!/bin/bash
+
+STATE_FILE="$HOME/.cache/hyprdscanout"
+
+if [ -f "$STATE_FILE" ]; then
+    hyprctl eval 'hl.config({ render = { direct_scanout = false } })'
+    rm -f "$STATE_FILE"
+    notify-send "Direct Scanout" "Disabled. Fullscreen fix is ON"
+else
+    hyprctl eval 'hl.config({ render = { direct_scanout = true } })'
+    touch "$STATE_FILE"
+    notify-send "Direct Scanout" "Enabled. Fullscreen fix is OFF"
+fi

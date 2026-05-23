@@ -1,0 +1,22 @@
+{
+  "revision": "1",
+  "keys": {
+    "nerdfont-search.recent-icons.v1": {
+      "size": 14133
+    },
+    "nerdfont-search.icon-index.3.4.0.v1": {
+      "size": 2280485
+    }
+  },
+  "lru": [
+    {
+      "key": "nerdfont-search.recent-icons.v1",
+      "lastUsedAt": 1779515932793
+    },
+    {
+      "key": "nerdfont-search.icon-index.3.4.0.v1",
+      "lastUsedAt": 1779493244550
+    }
+  ],
+  "size": 2294618
+}

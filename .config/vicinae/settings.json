@@ -1,0 +1,295 @@
+// This configuration is merged with the default vicinae configuration file, which you can obtain by running the `vicinae config default` command.
+// Every item defined in this file takes precedence over the values defined in the default config or any other imported file.
+//
+// You can make manual edits to this file, however you should keep in mind that this file may be written to by vicinae when a configuration change is made through the GUI.
+// When that happens, any custom comments or formatting will be lost.
+//
+// If you want to maintain a configuration file with your own comments and formatting, you should create a separate file and add it to the 'imports' array.
+//
+// Learn more about configuration at https://docs.vicinae.com/config
+
+{
+   "$schema": "https://vicinae.com/schemas/config.json",
+   "theme": {
+      "dark": {
+         "name": "noctalia"
+      }
+   },
+   "favorites": [
+      "@dagimg-dot/store.vicinae.wifi-commander:manage-saved-networks",
+      "@Gelei/store.vicinae.bluetooth:devices",
+      "system:run",
+      "applications:bitwarden",
+      "applications:com.github.wwmm.easyeffects",
+      "applications:foot",
+      "applications:kitty",
+      "applications:karing",
+      "applications:youtube-music",
+      "applications:zen",
+      "clipboard:history"
+   ],
+   "providers": {
+      "@Gelei/store.vicinae.bluetooth": {
+         "entrypoints": {
+            "bluetooth-off": {
+               "alias": "bt off"
+            },
+            "bluetooth-on": {
+               "alias": "bt on"
+            },
+            "devices": {
+               "alias": "bt"
+            },
+            "scan": {
+               "alias": "bt scan"
+            }
+         }
+      },
+      "@Keyruu/store.raycast.zen-browser": {
+         "preferences": {
+            "aiSearchHistoryLimitResults": "50",
+            "limitResults": "50",
+            "newTabShortcut": "command t",
+            "profileDirectorySuffix": "1pstlpwy.black",
+            "profilesDirectory": "/home/black/.zen/",
+            "searchEngine": "Google"
+         },
+         "entrypoints": {
+            "new-tab": {
+               "alias": "tn"
+            },
+            "search-history": {
+               "alias": "th"
+            }
+         }
+      },
+      "@asubbotin/store.raycast.shell": {
+         "preferences": {
+            "arguments_terminal": false,
+            "arguments_terminal_type": "kitty"
+         },
+         "entrypoints": {
+            "index": {
+               "alias": "sh"
+            }
+         }
+      },
+      "@brpaz/store.vicinae.brotab": {
+         "preferences": {
+            "brotabPath": "/home/black/.local/bin/brotab"
+         },
+         "entrypoints": {
+            "tabs-list": {
+               "alias": "t"
+            }
+         }
+      },
+      "@c4n4m1/store.vicinae.zoxide-recent-directories": {
+         "preferences": {
+            "application": "/usr/bin/alacritty",
+            "defaultFilter": "all",
+            "alternativeApplication": "usr/bin/zoxide"
+         },
+         "entrypoints": {
+            "recent-directories": {
+               "alias": "cd"
+            }
+         }
+      },
+      "@dagimg-dot/store.vicinae.wifi-commander": {
+         "entrypoints": {
+            "manage-saved-networks": {
+               "alias": "network"
+            },
+            "restart-wifi": {
+               "alias": "wifi rs"
+            },
+            "scan-wifi": {
+               "alias": "wifi sc"
+            },
+            "toggle-wifi-off": {
+               "alias": "wifi off"
+            },
+            "toggle-wifi-on": {
+               "alias": "wifi on"
+            }
+         }
+      },
+      "@gebeto/store.raycast.translate": {
+         "entrypoints": {
+            "instant-translate-copy": {
+               "enabled": false
+            },
+            "instant-translate-paste": {
+               "enabled": false
+            },
+            "instant-translate-view": {
+               "enabled": false
+            },
+            "translate-form": {
+               "enabled": false
+            }
+         }
+      },
+      "@knoopx/store.vicinae.github": {
+         "preferences": {
+            "defaultIssueFilter": "my",
+            "defaultRepositoryFilter": "my",
+            "numberOfResults": "50"
+         },
+         "entrypoints": {
+            "myRepositories": {
+               "alias": "repo"
+            },
+            "searchRepositories": {
+               "alias": "repos"
+            }
+         }
+      },
+      "@nikbpetrov/store.vicinae.it-tools": {
+         "entrypoints": {
+            "it-tools-command": {
+               "enabled": false
+            }
+         }
+      },
+      "@sameoldlab/store.vicinae.fuzzy-files": {
+         "entrypoints": {
+            "find": {
+               "alias": "fzf"
+            }
+         }
+      },
+      "applications": {
+         "entrypoints": {
+            "alacritty": {
+               "alias": "ala"
+            },
+            "bitwarden": {
+               "alias": "bw"
+            },
+            "btop": {
+               "alias": "top"
+            },
+            "com.github.wwmm.easyeffects": {
+               "alias": "ee"
+            },
+            "foot": {
+               "alias": "foo"
+            },
+            "helium": {
+               "alias": "heli"
+            },
+            "kitty": {
+               "alias": "kit"
+            },
+            "nvim": {
+               "alias": "nv"
+            },
+            "nwg-look": {
+               "alias": "nwg-look"
+            },
+            "org.moson.pacseek": {
+               "alias": "pac"
+            },
+            "org.pulseaudio.pavucontrol": {
+               "alias": "pavu"
+            },
+            "pcmanfm": {
+               "alias": "fm"
+            },
+            "qt5ct": {
+               "alias": "qt5ct"
+            },
+            "qt6ct": {
+               "alias": "qt6ct"
+            },
+            "wiremix": {
+               "alias": "wm"
+            },
+            "youtube-music": {
+               "alias": "ytm"
+            },
+            "zen": {
+               "alias": "z"
+            }
+         }
+      },
+      "browser-extension": {
+         "entrypoints": {
+            "shortcut-active-tab": {
+               "alias": "sc"
+            }
+         }
+      },
+      "clipboard": {
+         "preferences": {
+            "encryption": false,
+            "eraseOnStartup": false,
+            "ignorePasswords": false,
+            "monitoring": true
+         },
+         "entrypoints": {
+            "history": {
+               "alias": "c"
+            }
+         }
+      },
+      "files": {
+         "entrypoints": {
+            "search": {
+               "alias": "fd"
+            }
+         }
+      },
+      "scripts": {
+         "preferences": {
+            "customDirs": [
+               "/home/black/bin/others",
+               "/home/black/apps",
+               "/home/black/git/personal/twtv",
+               "/home/black/bin/hypr",
+               "/home/black/bin/vicinae"
+            ]
+         }
+      },
+      "shortcuts": {
+         "entrypoints": {
+            "sct-6662f074fd4b": {
+               "alias": "eur"
+            },
+            "sct-6cb2c15c7b31": {
+               "alias": "g"
+            },
+            "sct-795deaa204d4": {
+               "alias": "cl"
+            },
+            "sct-88bbeba1f858": {
+               "alias": "gh"
+            },
+            "sct-94911192effb": {
+               "alias": "ds"
+            },
+            "sct-bd7cfc8e3efd": {
+               "alias": "ytw"
+            },
+            "sct-db554f6a6346": {
+               "alias": "gpt"
+            },
+            "sct-e137c38422aa": {
+               "alias": "gbp"
+            },
+            "sct-fd6b606fb887": {
+               "alias": "ytw"
+            }
+         }
+      },
+      "wm": {
+         "entrypoints": {
+            "switch-windows": {
+               "alias": "sw"
+            }
+         }
+      }
+   }
+}

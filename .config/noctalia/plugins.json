@@ -1,0 +1,100 @@
+{
+    "sources": [
+        {
+            "enabled": true,
+            "name": "Noctalia Plugins",
+            "url": "https://github.com/noctalia-dev/noctalia-plugins"
+        },
+        {
+            "enabled": true,
+            "name": "whereareiam's repo",
+            "url": "https://github.com/whereareiam/noctalia-plugins"
+        },
+        {
+            "enabled": true,
+            "name": "rukh's unofficial plugins",
+            "url": "https://github.com/rukh-debug/noctalia-unofficial-plugins"
+        },
+        {
+            "enabled": true,
+            "name": "anthonyhab's noctalia-plugins",
+            "url": "https://github.com/anthonyhab/noctalia-plugins/"
+        },
+        {
+            "enabled": true,
+            "name": "hrzlgnm's noctalia-plugins",
+            "url": "https://github.com/hrzlgnm/noctalia-plugins"
+        },
+        {
+            "enabled": true,
+            "name": "kenanpelit's noctalia-plugins",
+            "url": "https://github.com/kenanpelit/noctalia-nplugins"
+        },
+        {
+            "enabled": true,
+            "name": "bennypowers's noctalia plugins",
+            "url": "https://github.com/bennypowers/noctalia-plugins"
+        },
+        {
+            "enabled": true,
+            "name": "ajunca's noctalia-plugins",
+            "url": "https://github.com/ajunca/noctalia-dropdown-terminal"
+        },
+        {
+            "enabled": true,
+            "name": "pahnin's noctalia-plugins",
+            "url": "https://github.com/pahnin/noctalia-unofficial-plugins"
+        }
+    ],
+    "states": {
+        "assistant-panel": {
+            "enabled": true,
+            "sourceUrl": "https://github.com/noctalia-dev/noctalia-plugins"
+        },
+        "clipper": {
+            "enabled": true,
+            "sourceUrl": "https://github.com/noctalia-dev/noctalia-plugins"
+        },
+        "custom-commands": {
+            "enabled": true,
+            "sourceUrl": "https://github.com/noctalia-dev/noctalia-plugins"
+        },
+        "dmenu": {
+            "enabled": true,
+            "sourceUrl": "https://github.com/noctalia-dev/noctalia-plugins"
+        },
+        "file-search": {
+            "enabled": true,
+            "sourceUrl": "https://github.com/noctalia-dev/noctalia-plugins"
+        },
+        "mimeapp-gui": {
+            "enabled": false,
+            "sourceUrl": "https://github.com/noctalia-dev/noctalia-plugins"
+        },
+        "nvim-session-provider": {
+            "enabled": false,
+            "sourceUrl": "https://github.com/noctalia-dev/noctalia-plugins"
+        },
+        "polkit-agent": {
+            "enabled": true,
+            "sourceUrl": "https://github.com/noctalia-dev/noctalia-plugins"
+        },
+        "screen-toolkit": {
+            "enabled": true,
+            "sourceUrl": "https://github.com/noctalia-dev/noctalia-plugins"
+        },
+        "shell-profiles": {
+            "enabled": false,
+            "sourceUrl": "https://github.com/noctalia-dev/noctalia-plugins"
+        },
+        "usb-drive-manager": {
+            "enabled": true,
+            "sourceUrl": "https://github.com/noctalia-dev/noctalia-plugins"
+        },
+        "wallcards": {
+            "enabled": true,
+            "sourceUrl": "https://github.com/noctalia-dev/noctalia-plugins"
+        }
+    },
+    "version": 2
+}

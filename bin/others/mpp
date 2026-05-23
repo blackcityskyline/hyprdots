@@ -1,0 +1,120 @@
+#!/usr/bin/env python3
+"""mpv wrapper with watch history."""
+
+import argparse
+import os
+import subprocess
+import sys
+from datetime import datetime
+from pathlib import Path
+
+HISTFILE = Path.home() / ".cache" / "mpv" / "history.log"
+
+
+def get_title(url: str) -> str:
+    """Ask yt-dlp for the video title, fall back to filename or raw URL."""
+    if not url.startswith(("http://", "https://")):
+        return os.path.basename(url)
+    try:
+        result = subprocess.run(
+            ["yt-dlp", "--print", "title", "--no-playlist", "--no-warnings", url],
+            capture_output=True, text=True, timeout=10,
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            return result.stdout.strip()
+    except Exception:
+        pass
+    return url
+
+
+def append_history(url: str) -> None:
+    """Write a new entry to the history file."""
+    HISTFILE.parent.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open(HISTFILE, "a", encoding="utf-8") as f:
+        f.write(f"{timestamp}\t{get_title(url)}\t{url}\n")
+
+
+def read_history(n: int) -> list[tuple[str, str, str]]:
+    """Return the last n entries as (timestamp, title, url) tuples."""
+    if not HISTFILE.is_file():
+        return []
+    with open(HISTFILE, encoding="utf-8") as f:
+        lines = f.readlines()
+    records = []
+    for line in lines[-n:]:
+        parts = line.strip().split("\t", 2)
+        if len(parts) == 3:
+            records.append(tuple(parts))
+    return records
+
+
+def pick_from_history(n: int) -> str | None:
+    """Print the last n entries and let the user pick one. Returns the URL."""
+    records = read_history(n)
+    if not records:
+        print("History is empty.", file=sys.stderr)
+        return None
+
+    for i, (_, title, url) in enumerate(records, 1):
+        print(f"{i:2d}. {title}\n    {url}")
+
+    try:
+        choice = int(input(f"\nPick a number (1–{len(records)}): "))
+        if not 1 <= choice <= len(records):
+            raise ValueError
+    except (ValueError, EOFError, KeyboardInterrupt):
+        print("\nCancelled.", file=sys.stderr)
+        return None
+
+    return records[choice - 1][2]
+
+
+def launch_mpv(url: str, extra_args: list[str], quiet: bool) -> None:
+    """Detach from terminal but keep mpv's log flowing to stderr."""
+    cmd = ["mpv"] + extra_args + [url]
+    subprocess.Popen(
+        cmd,
+        start_new_session=True,
+        stdout=subprocess.DEVNULL if quiet else None,  # mpv logs go to stdout
+        stderr=subprocess.DEVNULL,
+    )
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="mpv wrapper with watch history",
+        epilog="Pass extra mpv options after '--': mpv.py URL -- --volume=50",
+    )
+    parser.add_argument(
+        "-q", "--quiet", action="store_true",
+        help="suppress mpv log output",
+    )
+    parser.add_argument(
+        "-H", "--history", type=int, metavar="N",
+        help="pick from the last N history entries",
+    )
+    parser.add_argument("url", nargs="?", help="URL or file path")
+    parser.add_argument("mpv_args", nargs=argparse.REMAINDER, help="extra options passed to mpv")
+
+    args = parser.parse_args()
+    extra = [a for a in args.mpv_args if a != "--"]
+
+    if args.history is not None:
+        url = pick_from_history(args.history)
+        if url is None:
+            sys.exit(1)
+        append_history(url)
+        launch_mpv(url, extra, args.quiet)
+        return
+
+    if not args.url:
+        parser.print_help()
+        sys.exit(1)
+
+    append_history(args.url)
+    launch_mpv(args.url, extra, args.quiet)
+
+
+if __name__ == "__main__":
+    main()

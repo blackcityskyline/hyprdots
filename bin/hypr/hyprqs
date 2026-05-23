@@ -1,0 +1,54 @@
+#!/bin/bash
+# hyprqs — переключение между qs (noctalia-shell) и обычным окружением
+
+HYPR_LUA="$HOME/.config/hypr/hyprland.lua"
+
+WAYBAR_CMD="waybar"
+SWAYBG_CMD="$HOME/bin/others/swaybg-random"
+SWAYOSD_CMD="swayosd-server -s $HOME/.config/swayosd/style.css"
+SWAYNC_CMD="swaync"
+
+usage() { echo "Usage: hyprqs {on|off}"; exit 1; }
+
+start_qs() {
+    if ! pgrep -x qs >/dev/null; then
+        qs -c noctalia-shell &
+        sleep 0.5
+    fi
+}
+
+kill_qs() { pkill -x qs 2>/dev/null; }
+
+kill_normal() { killall -q waybar swaybg swayosd swayosd-server swaync 2>/dev/null; }
+
+start_normal() {
+    $WAYBAR_CMD &
+    $SWAYBG_CMD &
+    $SWAYOSD_CMD &
+    $SWAYNC_CMD &
+}
+
+switch_sources() {
+    case "$1" in
+    qs)
+        sed -i \
+            -e 's/^-- require("config\/rofikeybinds")/require("config\/rofikeybinds")/' \
+            -e 's/^require("config\/rofikeybinds")/-- require("config\/rofikeybinds")/' \
+            -e 's/^-- require("config\/qskeybinds")/require("config\/qskeybinds")/' \
+            "$HYPR_LUA"
+        ;;
+    normal)
+        sed -i \
+            -e 's/^require("config\/qskeybinds")/-- require("config\/qskeybinds")/' \
+            -e 's/^-- require("config\/rofikeybinds")/require("config\/rofikeybinds")/' \
+            "$HYPR_LUA"
+        ;;
+    esac
+    hyprctl reload
+}
+
+case "$1" in
+on)  start_qs;  kill_normal;  switch_sources qs     ;;
+off) kill_qs;   switch_sources normal; sleep 0.3; start_normal ;;
+*)   usage ;;
+esac

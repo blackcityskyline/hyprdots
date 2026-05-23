@@ -1,0 +1,10 @@
+# =============================================================================
+# cachyos-packages-extra — CachyOS пакеты для WM окружения и гейминга
+# =============================================================================
+
+cachy-update
+cachyos-gaming-meta
+proton-cachyos
+proton-cachyos-slr
+wine-cachyos
+hyprland-cachyos-settings

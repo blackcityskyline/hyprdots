@@ -1,0 +1,143 @@
+#!/usr/bin/env bash
+# Screen recorder for Wayland / X11
+
+OUTPUT="$HOME/Videos/screencast-$(date +%Y%m%d-%H%M%S).mp4"
+COMBINED_SINK=""
+LOOPBACK_MODULES=()
+
+# --- helpers ---
+
+notify() {
+  local title="$1" msg="$2" urgency="${3:-normal}"
+  echo "[$(date '+%H:%M:%S')] $title: $msg"
+  command -v notify-send &>/dev/null && notify-send -u "$urgency" "$title" "$msg"
+}
+
+require() {
+  for cmd in "$@"; do
+    command -v "$cmd" &>/dev/null || {
+      notify "Error" "Install $cmd" "critical"
+      exit 1
+    }
+  done
+}
+
+# --- audio ---
+
+setup_audio() {
+  COMBINED_SINK=$(pactl load-module module-null-sink \
+    sink_name=screencast_mix \
+    sink_properties=device.description=ScreencastMix 2>/dev/null)
+
+  [[ -z "$COMBINED_SINK" ]] && echo "$SYSTEM_AUDIO" && return
+
+  local lb
+  lb=$(pactl load-module module-loopback \
+    source="$SYSTEM_AUDIO" sink=screencast_mix latency_msec=50 2>/dev/null)
+  [[ -n "$lb" ]] && LOOPBACK_MODULES+=("$lb")
+
+  if [[ -n "$MIC_SOURCE" ]]; then
+    lb=$(pactl load-module module-loopback \
+      source="$MIC_SOURCE" sink=screencast_mix latency_msec=50 2>/dev/null)
+    [[ -n "$lb" ]] && LOOPBACK_MODULES+=("$lb")
+  fi
+
+  echo "screencast_mix.monitor"
+}
+
+cleanup_audio() {
+  for mod in "${LOOPBACK_MODULES[@]}"; do
+    pactl unload-module "$mod" 2>/dev/null
+  done
+  [[ -n "$COMBINED_SINK" ]] && pactl unload-module "$COMBINED_SINK" 2>/dev/null
+}
+
+cleanup() {
+  [[ -n "$REC_PID" ]] && kill -SIGINT "$REC_PID" 2>/dev/null && wait "$REC_PID" 2>/dev/null
+  cleanup_audio
+  rm -f /tmp/screencast.pid
+  notify "Stopped" "Recording stopped"
+}
+
+trap cleanup INT TERM EXIT
+
+# --- session ---
+
+require pactl
+
+SYSTEM_AUDIO="$(pactl get-default-sink).monitor"
+MIC_SOURCE="$(pactl get-default-source)"
+[[ "$MIC_SOURCE" == *.monitor ]] && MIC_SOURCE=""
+
+IS_WAYLAND=false
+IS_X11=false
+[[ "$XDG_SESSION_TYPE" == "wayland" || -n "$WAYLAND_DISPLAY" ]] && IS_WAYLAND=true
+[[ "$XDG_SESSION_TYPE" == "x11" || -n "$DISPLAY" ]] && IS_X11=true
+
+$IS_WAYLAND || $IS_X11 || {
+  notify "Error" "Unknown session type" "critical"
+  exit 1
+}
+
+# --- area selection ---
+
+AREA=""
+if $IS_WAYLAND; then
+  require wf-recorder slurp
+  notify "Select area" "Draw a region to record"
+  AREA=$(slurp 2>/dev/null)
+  [[ -z "$AREA" ]] && {
+    notify "Cancelled" "No area selected" "critical"
+    exit 1
+  }
+else
+  require ffmpeg xrandr
+fi
+
+# --- audio setup ---
+
+if [[ -n "$MIC_SOURCE" ]]; then
+  notify "Audio" "System + mic → virtual mix"
+  AUDIO_SOURCE=$(setup_audio)
+else
+  notify "Audio" "System only: $SYSTEM_AUDIO"
+  AUDIO_SOURCE="$SYSTEM_AUDIO"
+fi
+
+# --- record ---
+
+notify "Recording" "Started. Ctrl+C to stop."
+
+if $IS_WAYLAND; then
+  wf-recorder \
+    -g "$AREA" \
+    -f "$OUTPUT" \
+    --codec libx264 \
+    --audio="$AUDIO_SOURCE" \
+    --no-dmabuf &
+else
+  RES=$(xrandr 2>/dev/null | awk '/\*/ {print $1; exit}')
+  [[ -z "$RES" ]] && RES="1920x1080"
+  ffmpeg -hide_banner \
+    -f pulse -i "$AUDIO_SOURCE" \
+    -f x11grab -video_size "$RES" -framerate 30 -i ":0.0" \
+    -c:v libx264 -crf 23 -preset fast -pix_fmt yuv420p \
+    -c:a aac -b:a 128k \
+    -y "$OUTPUT" &
+fi
+
+REC_PID=$!
+echo "$REC_PID" >/tmp/screencast.pid
+wait "$REC_PID"
+
+# trap EXIT handles cleanup automatically
+
+# --- result ---
+
+if [[ -f "$OUTPUT" && -s "$OUTPUT" ]]; then
+  SIZE=$(du -h "$OUTPUT" | cut -f1)
+  notify "Done" "$OUTPUT ($SIZE)"
+else
+  notify "Error" "Output file not created" "critical"
+  exit 1
+fi

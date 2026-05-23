@@ -1,0 +1,1957 @@
+{
+    "appLauncher": {
+        "autoPasteClipboard": false,
+        "clipboardWatchImageCommand": "wl-paste --type image --watch cliphist store",
+        "clipboardWatchTextCommand": "wl-paste --type text --watch cliphist store",
+        "clipboardWrapText": true,
+        "customLaunchPrefix": "",
+        "customLaunchPrefixEnabled": false,
+        "density": "default",
+        "enableClipPreview": true,
+        "enableClipboardChips": true,
+        "enableClipboardHistory": true,
+        "enableClipboardSmartIcons": true,
+        "enableSessionSearch": true,
+        "enableSettingsSearch": true,
+        "enableWindowsSearch": true,
+        "iconMode": "tabler",
+        "ignoreMouseInput": false,
+        "overviewLayer": true,
+        "pinnedApps": [
+        ],
+        "position": "center",
+        "screenshotAnnotationTool": "",
+        "showCategories": false,
+        "showIconBackground": false,
+        "sortByMostUsed": true,
+        "terminalCommand": "alacritty -e",
+        "viewMode": "list"
+    },
+    "audio": {
+        "mprisBlacklist": [
+        ],
+        "preferredPlayer": "mpv",
+        "spectrumFrameRate": 30,
+        "spectrumMirrored": true,
+        "visualizerType": "linear",
+        "volumeFeedback": false,
+        "volumeFeedbackSoundFile": "",
+        "volumeOverdrive": true,
+        "volumeStep": 5
+    },
+    "bar": {
+        "autoHideDelay": 500,
+        "autoShowDelay": 150,
+        "backgroundOpacity": 0.9,
+        "barType": "floating",
+        "capsuleColorKey": "none",
+        "capsuleOpacity": 0.49,
+        "contentPadding": 2,
+        "density": "default",
+        "displayMode": "always_visible",
+        "enableExclusionZoneInset": true,
+        "fontScale": 0.9,
+        "frameRadius": 12,
+        "frameThickness": 8,
+        "hideOnOverview": false,
+        "marginHorizontal": 6,
+        "marginVertical": 6,
+        "middleClickAction": "settings",
+        "middleClickCommand": "",
+        "middleClickFollowMouse": false,
+        "monitors": [
+        ],
+        "mouseWheelAction": "volume",
+        "mouseWheelWrap": true,
+        "outerCorners": true,
+        "position": "top",
+        "reverseScroll": false,
+        "rightClickAction": "controlCenter",
+        "rightClickCommand": "",
+        "rightClickFollowMouse": true,
+        "screenOverrides": [
+        ],
+        "showCapsule": true,
+        "showOnWorkspaceSwitch": true,
+        "showOutline": false,
+        "useSeparateOpacity": true,
+        "widgetSpacing": 0,
+        "widgets": {
+            "center": [
+                {
+                    "defaultSettings": {
+                        "enableTodoIntegration": false,
+                        "notecardsEnabled": true,
+                        "pincardsEnabled": true,
+                        "showCloseButton": true
+                    },
+                    "id": "plugin:clipper"
+                },
+                {
+                    "characterCount": 2,
+                    "colorizeIcons": true,
+                    "emptyColor": "none",
+                    "enableScrollWheel": true,
+                    "focusedColor": "primary",
+                    "followFocusedScreen": false,
+                    "fontWeight": "bold",
+                    "groupedBorderOpacity": 1,
+                    "hideUnoccupied": true,
+                    "iconScale": 0.8,
+                    "id": "Workspace",
+                    "labelMode": "index",
+                    "occupiedColor": "secondary",
+                    "pillSize": 0.7,
+                    "showApplications": false,
+                    "showApplicationsHover": true,
+                    "showBadge": true,
+                    "showLabelsOnlyWhenOccupied": true,
+                    "unfocusedIconsOpacity": 1
+                }
+            ],
+            "left": [
+                {
+                    "colorizeSystemIcon": "primary",
+                    "colorizeSystemText": "none",
+                    "customIconPath": "/home/black/Pictures/userpics-icons/Arch_Linux__Crystal__icon.svg",
+                    "enableColorization": true,
+                    "icon": "rocket",
+                    "iconColor": "none",
+                    "id": "Launcher",
+                    "useDistroLogo": true
+                },
+                {
+                    "compactMode": false,
+                    "diskPath": "/",
+                    "iconColor": "primary",
+                    "id": "SystemMonitor",
+                    "showCpuCores": false,
+                    "showCpuFreq": false,
+                    "showCpuTemp": true,
+                    "showCpuUsage": true,
+                    "showDiskAvailable": false,
+                    "showDiskUsage": false,
+                    "showDiskUsageAsPercent": false,
+                    "showGpuTemp": false,
+                    "showLoadAverage": false,
+                    "showMemoryAsPercent": false,
+                    "showMemoryUsage": false,
+                    "showNetworkStats": false,
+                    "showSwapUsage": false,
+                    "textColor": "primary",
+                    "useMonospaceFont": true,
+                    "usePadding": false
+                },
+                {
+                    "compactMode": false,
+                    "hideMode": "hidden",
+                    "hideWhenIdle": false,
+                    "id": "MediaMini",
+                    "maxWidth": 300,
+                    "panelShowAlbumArt": true,
+                    "scrollingMode": "hover",
+                    "showAlbumArt": true,
+                    "showArtistFirst": true,
+                    "showProgressRing": true,
+                    "showVisualizer": false,
+                    "textColor": "primary",
+                    "useFixedWidth": false,
+                    "visualizerType": "mirrored"
+                },
+                {
+                    "defaultSettings": {
+                        "ai": {
+                            "apiKeys": {
+                            },
+                            "maxHistoryLength": 100,
+                            "model": "gemini-2.5-flash",
+                            "openaiBaseUrl": "https://api.openai.com/v1/chat/completions",
+                            "openaiLocal": false,
+                            "provider": "google",
+                            "systemPrompt": "You are a helpful assistant integrated into a Linux desktop shell. Be concise and helpful.",
+                            "temperature": 0.7
+                        },
+                        "maxHistoryLength": 100,
+                        "panelDetached": true,
+                        "panelHeightRatio": 0.85,
+                        "panelPosition": "right",
+                        "panelWidth": 520,
+                        "scale": 1,
+                        "translator": {
+                            "backend": "google",
+                            "deeplApiKey": "",
+                            "realTimeTranslation": true,
+                            "sourceLanguage": "auto",
+                            "targetLanguage": "en"
+                        }
+                    },
+                    "id": "plugin:assistant-panel"
+                }
+            ],
+            "right": [
+                {
+                    "blacklist": [
+                    ],
+                    "chevronColor": "primary",
+                    "colorizeIcons": false,
+                    "drawerEnabled": true,
+                    "hidePassive": false,
+                    "id": "Tray",
+                    "pinned": [
+                    ]
+                },
+                {
+                    "displayMode": "forceOpen",
+                    "iconColor": "primary",
+                    "id": "KeyboardLayout",
+                    "showIcon": true,
+                    "textColor": "primary"
+                },
+                {
+                    "colorizeSystemIcon": "primary",
+                    "colorizeSystemText": "none",
+                    "generalTooltipText": "",
+                    "hideMode": "alwaysExpanded",
+                    "icon": "brand-firefox",
+                    "iconPosition": "left",
+                    "id": "CustomButton",
+                    "ipcIdentifier": "",
+                    "leftClickExec": "update-stylus",
+                    "leftClickUpdateText": false,
+                    "maxTextLength": {
+                        "horizontal": 10,
+                        "vertical": 10
+                    },
+                    "middleClickExec": "",
+                    "middleClickUpdateText": false,
+                    "parseJson": false,
+                    "rightClickExec": "",
+                    "rightClickUpdateText": false,
+                    "showExecTooltip": true,
+                    "showIcon": true,
+                    "showTextTooltip": true,
+                    "textCollapse": "",
+                    "textCommand": "",
+                    "textIntervalMs": 3000,
+                    "textStream": false,
+                    "wheelDownExec": "",
+                    "wheelDownUpdateText": false,
+                    "wheelExec": "",
+                    "wheelMode": "unified",
+                    "wheelUpExec": "",
+                    "wheelUpUpdateText": false,
+                    "wheelUpdateText": false
+                },
+                {
+                    "displayMode": "onhover",
+                    "iconColor": "primary",
+                    "id": "Volume",
+                    "middleClickCommand": "pwvucontrol || pavucontrol",
+                    "textColor": "secondary"
+                },
+                {
+                    "applyToAllMonitors": false,
+                    "displayMode": "onhover",
+                    "iconColor": "primary",
+                    "id": "Brightness",
+                    "textColor": "secondary"
+                },
+                {
+                    "deviceNativePath": "__default__",
+                    "displayMode": "graphic-clean",
+                    "hideIfIdle": false,
+                    "hideIfNotDetected": true,
+                    "id": "Battery",
+                    "showNoctaliaPerformance": false,
+                    "showPowerProfiles": false
+                },
+                {
+                    "colorizeDistroLogo": false,
+                    "colorizeSystemIcon": "primary",
+                    "colorizeSystemText": "none",
+                    "customIconPath": "",
+                    "enableColorization": true,
+                    "icon": "alien",
+                    "id": "ControlCenter",
+                    "useDistroLogo": false
+                },
+                {
+                    "hideWhenZero": true,
+                    "hideWhenZeroUnread": false,
+                    "iconColor": "primary",
+                    "id": "NotificationHistory",
+                    "showUnreadBadge": true,
+                    "unreadBadgeColor": "secondary"
+                },
+                {
+                    "clockColor": "primary",
+                    "customFont": "",
+                    "formatHorizontal": "HH:mm",
+                    "formatVertical": "HH mm",
+                    "id": "Clock",
+                    "tooltipFormat": "HH:mm ddd, MMM dd",
+                    "useCustomFont": false
+                },
+                {
+                    "defaultSettings": {
+                        "autoMount": false,
+                        "fileBrowser": "yazi",
+                        "hideWhenEmpty": false,
+                        "iconColor": "none",
+                        "showBadge": false,
+                        "showNotifications": true,
+                        "terminalCommand": "kitty"
+                    },
+                    "id": "plugin:usb-drive-manager"
+                }
+            ]
+        }
+    },
+    "brightness": {
+        "backlightDeviceMappings": [
+        ],
+        "brightnessStep": 2,
+        "enableDdcSupport": false,
+        "enforceMinimum": true
+    },
+    "calendar": {
+        "cards": [
+            {
+                "enabled": true,
+                "id": "calendar-header-card"
+            },
+            {
+                "enabled": true,
+                "id": "calendar-month-card"
+            },
+            {
+                "enabled": true,
+                "id": "weather-card"
+            }
+        ]
+    },
+    "colorSchemes": {
+        "darkMode": true,
+        "generationMethod": "tonal-spot",
+        "manualSunrise": "15:00",
+        "manualSunset": "17:00",
+        "monitorForColors": "",
+        "predefinedScheme": "Tokyo Night",
+        "schedulingMode": "off",
+        "syncGsettings": true,
+        "useWallpaperColors": true
+    },
+    "controlCenter": {
+        "cards": [
+            {
+                "enabled": true,
+                "id": "profile-card"
+            },
+            {
+                "enabled": true,
+                "id": "shortcuts-card"
+            },
+            {
+                "enabled": true,
+                "id": "audio-card"
+            },
+            {
+                "enabled": true,
+                "id": "brightness-card"
+            },
+            {
+                "enabled": true,
+                "id": "weather-card"
+            },
+            {
+                "enabled": false,
+                "id": "media-sysmon-card"
+            }
+        ],
+        "diskPath": "/",
+        "position": "close_to_bar_button",
+        "shortcuts": {
+            "left": [
+                {
+                    "id": "Network"
+                },
+                {
+                    "id": "Bluetooth"
+                },
+                {
+                    "id": "NoctaliaPerformance"
+                },
+                {
+                    "enableOnStateLogic": true,
+                    "generalTooltipText": "",
+                    "icon": "hyprland",
+                    "id": "CustomButton",
+                    "onClicked": "~/bin/hypr/hyprvisuals",
+                    "onMiddleClicked": "",
+                    "onRightClicked": "~/bin/hypr/hyprdscanout",
+                    "showExecTooltip": true,
+                    "stateChecksJson": "[]"
+                }
+            ],
+            "right": [
+                {
+                    "id": "Notifications"
+                },
+                {
+                    "id": "PowerProfile"
+                },
+                {
+                    "id": "KeepAwake"
+                },
+                {
+                    "id": "NightLight"
+                },
+                {
+                    "defaultSettings": {
+                        "colorHistory": [
+                        ],
+                        "detectedCompositor": "",
+                        "detectedRecorder": "",
+                        "filenameFormat": "",
+                        "installedLangs": [
+                            "eng"
+                        ],
+                        "paletteColors": [
+                        ],
+                        "screenshotPath": "",
+                        "selectedOcrLang": "eng",
+                        "transAvailable": false,
+                        "videoPath": ""
+                    },
+                    "id": "plugin:screen-toolkit"
+                }
+            ]
+        }
+    },
+    "desktopWidgets": {
+        "enabled": false,
+        "gridSnap": false,
+        "gridSnapScale": false,
+        "monitorWidgets": [
+            {
+                "name": "LVDS-1",
+                "widgets": [
+                    {
+                        "hideMode": "visible",
+                        "id": "MediaPlayer",
+                        "roundedCorners": true,
+                        "scale": 1,
+                        "showAlbumArt": true,
+                        "showBackground": true,
+                        "showButtons": true,
+                        "showVisualizer": true,
+                        "visualizerType": "linear",
+                        "x": 133,
+                        "y": 101
+                    }
+                ]
+            }
+        ],
+        "overviewEnabled": false
+    },
+    "dock": {
+        "animationSpeed": 2,
+        "backgroundOpacity": 0.32,
+        "colorizeIcons": true,
+        "deadOpacity": 0.5,
+        "displayMode": "auto_hide",
+        "dockType": "floating",
+        "enabled": true,
+        "floatingRatio": 1.01,
+        "groupApps": true,
+        "groupClickAction": "cycle",
+        "groupContextMenuMode": "extended",
+        "groupIndicatorStyle": "dots",
+        "inactiveIndicators": false,
+        "indicatorColor": "none",
+        "indicatorOpacity": 0.6,
+        "indicatorThickness": 3,
+        "launcherIcon": "",
+        "launcherIconColor": "none",
+        "launcherPosition": "end",
+        "launcherUseDistroLogo": false,
+        "monitors": [
+        ],
+        "onlySameOutput": true,
+        "pinnedApps": [
+        ],
+        "pinnedStatic": false,
+        "position": "bottom",
+        "showDockIndicator": true,
+        "showLauncherIcon": false,
+        "sitOnFrame": false,
+        "size": 0.77
+    },
+    "general": {
+        "allowPanelsOnScreenWithoutBar": true,
+        "allowPasswordWithFprintd": false,
+        "animationDisabled": false,
+        "animationSpeed": 1,
+        "autoStartAuth": false,
+        "avatarImage": "/home/black/Pictures/userpics-icons/393f3dde-77a0-4fff-8d7e-51cc1f7d6ded.jpeg",
+        "boxRadiusRatio": 1,
+        "clockFormat": "HH:mm dd.MM.yyyy ",
+        "clockStyle": "custom",
+        "compactLockScreen": false,
+        "dimmerOpacity": 0.25,
+        "enableBlurBehind": false,
+        "enableLockScreenCountdown": true,
+        "enableLockScreenMediaControls": true,
+        "enableShadows": false,
+        "forceBlackScreenCorners": false,
+        "iRadiusRatio": 1,
+        "keybinds": {
+            "keyDown": [
+                "Down"
+            ],
+            "keyEnter": [
+                "Return",
+                "Enter"
+            ],
+            "keyEscape": [
+                "Esc"
+            ],
+            "keyLeft": [
+                "Left"
+            ],
+            "keyRemove": [
+                "Del"
+            ],
+            "keyRight": [
+                "Right"
+            ],
+            "keyUp": [
+                "Up"
+            ]
+        },
+        "language": "en",
+        "lockOnSuspend": false,
+        "lockScreenAnimations": true,
+        "lockScreenBlur": 0.5,
+        "lockScreenCountdownDuration": 2000,
+        "lockScreenMonitors": [
+        ],
+        "lockScreenTint": 0.25,
+        "passwordChars": true,
+        "radiusRatio": 1,
+        "reverseScroll": false,
+        "scaleRatio": 1,
+        "screenRadiusRatio": 0.99,
+        "shadowDirection": "bottom_right",
+        "shadowOffsetX": 2,
+        "shadowOffsetY": 3,
+        "showChangelogOnStartup": true,
+        "showHibernateOnLockScreen": false,
+        "showScreenCorners": false,
+        "showSessionButtonsOnLockScreen": true,
+        "smoothScrollEnabled": true,
+        "telemetryEnabled": false
+    },
+    "hooks": {
+        "colorGeneration": "",
+        "darkModeChange": "",
+        "enabled": true,
+        "performanceModeDisabled": "hyprvisuals on",
+        "performanceModeEnabled": "hyprvisuals off",
+        "screenLock": "",
+        "screenUnlock": "",
+        "session": "",
+        "startup": "",
+        "wallpaperChange": ""
+    },
+    "idle": {
+        "customCommands": "[]",
+        "enabled": true,
+        "fadeDuration": 5,
+        "lockCommand": "",
+        "lockTimeout": 1500,
+        "resumeLockCommand": "",
+        "resumeScreenOffCommand": "",
+        "resumeSuspendCommand": "",
+        "screenOffCommand": "",
+        "screenOffTimeout": 600,
+        "suspendCommand": "",
+        "suspendTimeout": 10800
+    },
+    "location": {
+        "analogClockInCalendar": false,
+        "autoLocate": false,
+        "firstDayOfWeek": -1,
+        "hideWeatherCityName": false,
+        "hideWeatherTimezone": false,
+        "name": "Minsk, BY",
+        "showCalendarEvents": true,
+        "showCalendarWeather": true,
+        "showWeekNumberInCalendar": false,
+        "use12hourFormat": false,
+        "useFahrenheit": false,
+        "weatherEnabled": true,
+        "weatherShowEffects": true,
+        "weatherTaliaMascotAlways": false
+    },
+    "network": {
+        "bluetoothAutoConnect": true,
+        "bluetoothDetailsViewMode": "grid",
+        "bluetoothHideUnnamedDevices": false,
+        "bluetoothRssiPollIntervalMs": 60000,
+        "bluetoothRssiPollingEnabled": true,
+        "disableDiscoverability": false,
+        "networkPanelView": "wifi",
+        "wifiDetailsViewMode": "grid"
+    },
+    "nightLight": {
+        "autoSchedule": false,
+        "dayTemp": "5327",
+        "enabled": true,
+        "forced": false,
+        "manualSunrise": "15:00",
+        "manualSunset": "18:30",
+        "nightTemp": "3303"
+    },
+    "noctaliaPerformance": {
+        "disableDesktopWidgets": true,
+        "disableWallpaper": false
+    },
+    "notifications": {
+        "backgroundOpacity": 1,
+        "clearDismissed": true,
+        "criticalUrgencyDuration": 8,
+        "density": "default",
+        "enableBatteryToast": true,
+        "enableKeyboardLayoutToast": true,
+        "enableMarkdown": true,
+        "enableMediaToast": false,
+        "enabled": true,
+        "location": "top_right",
+        "lowUrgencyDuration": 2,
+        "monitors": [
+        ],
+        "normalUrgencyDuration": 4,
+        "overlayLayer": true,
+        "respectExpireTimeout": true,
+        "saveToHistory": {
+            "critical": true,
+            "low": true,
+            "normal": true
+        },
+        "sounds": {
+            "criticalSoundFile": "",
+            "enabled": true,
+            "excludedApps": "discord,firefox,chrome,chromium,edge",
+            "lowSoundFile": "",
+            "normalSoundFile": "",
+            "separateSounds": false,
+            "volume": 0.25
+        }
+    },
+    "osd": {
+        "autoHideMs": 1000,
+        "backgroundOpacity": 1,
+        "enabled": true,
+        "enabledTypes": [
+            0,
+            1,
+            2,
+            3
+        ],
+        "location": "top",
+        "monitors": [
+        ],
+        "overlayLayer": true
+    },
+    "plugins": {
+        "autoUpdate": true,
+        "notifyUpdates": true
+    },
+    "sessionMenu": {
+        "countdownDuration": 2000,
+        "enableCountdown": true,
+        "largeButtonsLayout": "single-row",
+        "largeButtonsStyle": true,
+        "position": "center",
+        "powerOptions": [
+            {
+                "action": "lock",
+                "command": "",
+                "countdownEnabled": true,
+                "enabled": true,
+                "keybind": "1"
+            },
+            {
+                "action": "suspend",
+                "command": "",
+                "countdownEnabled": false,
+                "enabled": true,
+                "keybind": "2"
+            },
+            {
+                "action": "hibernate",
+                "command": "",
+                "countdownEnabled": true,
+                "enabled": false,
+                "keybind": ""
+            },
+            {
+                "action": "reboot",
+                "command": "",
+                "countdownEnabled": true,
+                "enabled": true,
+                "keybind": "3"
+            },
+            {
+                "action": "logout",
+                "command": "",
+                "countdownEnabled": true,
+                "enabled": true,
+                "keybind": "4"
+            },
+            {
+                "action": "shutdown",
+                "command": "",
+                "countdownEnabled": true,
+                "enabled": true,
+                "keybind": "5"
+            },
+            {
+                "action": "rebootToUefi",
+                "command": "",
+                "countdownEnabled": true,
+                "enabled": true,
+                "keybind": "6"
+            },
+            {
+                "action": "userspaceReboot",
+                "command": "",
+                "countdownEnabled": true,
+                "enabled": false,
+                "keybind": ""
+            }
+        ],
+        "showHeader": true,
+        "showKeybinds": true
+    },
+    "settingsVersion": 59,
+    "systemMonitor": {
+        "batteryCriticalThreshold": 5,
+        "batteryWarningThreshold": 20,
+        "cpuCriticalThreshold": 90,
+        "cpuWarningThreshold": 80,
+        "criticalColor": "#ffb4ab",
+        "diskAvailCriticalThreshold": 10,
+        "diskAvailWarningThreshold": 20,
+        "diskCriticalThreshold": 90,
+        "diskWarningThreshold": 80,
+        "enableDgpuMonitoring": false,
+        "externalMonitor": "btop || resources || missioncenter || jdsystemmonitor || corestats || system-monitoring-center || gnome-system-monitor || plasma-systemmonitor || mate-system-monitor || ukui-system-monitor || deepin-system-monitor || pantheon-system-monitorop",
+        "gpuCriticalThreshold": 90,
+        "gpuWarningThreshold": 80,
+        "memCriticalThreshold": 90,
+        "memWarningThreshold": 80,
+        "swapCriticalThreshold": 90,
+        "swapWarningThreshold": 80,
+        "tempCriticalThreshold": 90,
+        "tempWarningThreshold": 80,
+        "useCustomColors": true,
+        "warningColor": "#cfc0e8"
+    },
+    "templates": {
+        "activeTemplates": [
+            {
+                "enabled": true,
+                "id": "btop"
+            },
+            {
+                "enabled": true,
+                "id": "alacritty"
+            },
+            {
+                "enabled": true,
+                "id": "gtk"
+            },
+            {
+                "enabled": true,
+                "id": "yazi"
+            },
+            {
+                "enabled": true,
+                "id": "telegram"
+            },
+            {
+                "enabled": true,
+                "id": "kitty"
+            },
+            {
+                "enabled": true,
+                "id": "hyprland"
+            },
+            {
+                "enabled": true,
+                "id": "foot"
+            },
+            {
+                "enabled": true,
+                "id": "kcolorscheme"
+            },
+            {
+                "enabled": true,
+                "id": "zenBrowser"
+            },
+            {
+                "enabled": true,
+                "id": "cava"
+            },
+            {
+                "enabled": true,
+                "id": "zathura"
+            },
+            {
+                "enabled": true,
+                "id": "hyprtoolkit"
+            },
+            {
+                "enabled": true,
+                "id": "qt"
+            },
+            {
+                "enabled": true,
+                "id": "pywalfox"
+            },
+            {
+                "enabled": true,
+                "id": "vicinae"
+            },
+            {
+                "enabled": true,
+                "id": "starship"
+            }
+        ],
+        "enableUserTheming": true
+    },
+    "ui": {
+        "boxBorderEnabled": false,
+        "fontDefault": "Noto Sans",
+        "fontDefaultScale": 0.95,
+        "fontFixed": "JetBrainsMono NF",
+        "fontFixedScale": 0.9,
+        "panelBackgroundOpacity": 1,
+        "panelsAttachedToBar": true,
+        "scrollbarAlwaysVisible": false,
+        "settingsPanelMode": "centered",
+        "settingsPanelSideBarCardStyle": true,
+        "tooltipsEnabled": false,
+        "translucentWidgets": true
+    },
+    "wallpaper": {
+        "automationEnabled": false,
+        "directory": "/home/black/Pictures/wallpapers",
+        "enableMultiMonitorDirectories": false,
+        "enabled": true,
+        "favorites": [
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#67dbb1",
+                    "#b3ccbf",
+                    "#a6cce0",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-night/tokyonight-temple2-orig.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#b9c3ff",
+                    "#c3c5dd",
+                    "#e5bad8",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-night/tokyonight-temple.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#a8c8ff",
+                    "#bdc7dc",
+                    "#dcbce1",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-night/tokyonight-landscape7-temple.png",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#b2c5ff",
+                    "#c0c6dd",
+                    "#e1bbdd",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-night/tokyonight-landscape34-temple-dark-blue.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#a4c9ff",
+                    "#bcc7db",
+                    "#d9bde3",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-night/japan_trees_fog_house_temple_buda_snow_red-orig.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#b7c4ff",
+                    "#c2c5dd",
+                    "#e4bada",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-night/tokyonight-temple2.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#c3c0ff",
+                    "#c7c4dd",
+                    "#eab9d2",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-night/japan_trees_fog_house_temple_buda_snow_red.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#b4c5ff",
+                    "#c1c5dd",
+                    "#e2bbdb",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-night/a_mountain_with_snow_on_top_and_a_body_of_water.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#94ccff",
+                    "#b8c8da",
+                    "#d2bfe7",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-night/blue_foggy_lake_bridge_night_grass_art_woman_sunset-orig.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#9ccaff",
+                    "#bac8db",
+                    "#d5bee5",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-night/sand_dune_sunrise_sun_sky_dark_person-orig.png",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#b2c5ff",
+                    "#c0c6dd",
+                    "#e1bbdd",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-night/tokyonight-arch-water-blue.png",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#a2c9ff",
+                    "#bbc7db",
+                    "#d8bde3",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-night/moonlit-night-in-crimea-aivazovsky-orig.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Kanagawa",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#ffb959",
+                    "#dec2a2",
+                    "#bacd9f",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-night/tokyonight-landscape12-road-blue-yellow-orig.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#ffb59e",
+                    "#e7bdb1",
+                    "#d7c68d",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-night/sunset-yellow-dark-orig.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#c0c1ff",
+                    "#c6c4dd",
+                    "#e9b9d3",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-night/tokyocity.png",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#ffb68a",
+                    "#e5bfa9",
+                    "#cbc992",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-night/susnet10-orig.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#acc7ff",
+                    "#bec6dc",
+                    "#ddbce0",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-night/tokyonight-landscape8-xp-orig.png",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#b3c5ff",
+                    "#c1c6dd",
+                    "#e1bbdc",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-night/tokyonight-landscape-mountains-blue.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#ffb3ae",
+                    "#e7bdb9",
+                    "#e2c28c",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-night/tokyonight-street8-orig.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#a9c7ff",
+                    "#bdc7dc",
+                    "#dcbce1",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-night/sky_sun_tree_waterfall_mountains_water_clouds_rocks_hill_red_tokyo-orig.png",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#c4c0ff",
+                    "#c7c4dc",
+                    "#ebb9d0",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-night/tokyonight-room-window-orig.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#b4c5ff",
+                    "#c1c5dd",
+                    "#e2bbdb",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/Dynamic-Wallpapers/Dark/Fuji-Dark.png",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "content",
+                "paletteColors": [
+                    "#b9cacb",
+                    "#c2c8c8",
+                    "#cac4d5",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/a_mountain_with_snow_on_top_and_a_body_of_water.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#9bcbff",
+                    "#bac8db",
+                    "#d5bee5",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/arch-hypno-dark-blue.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#94ccff",
+                    "#b8c8da",
+                    "#d2bfe7",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/blue_foggy_lake_bridge_night_grass_art_woman_sunset.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#a0c9ff",
+                    "#bbc7db",
+                    "#d7bde4",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/city_grey_buildings_trees_lake_person_bench.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#a2c9ff",
+                    "#bbc7db",
+                    "#d8bde3",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/moonlit-night-in-crimea-aivazovsky.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#a4c9ff",
+                    "#bcc7db",
+                    "#d9bde3",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/japan_trees_fog_house_temple_buda_snow_red.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#57d6f6",
+                    "#b2cbd3",
+                    "#c0c4eb",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/nature-landscape-chair-dark-blue-green.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#9acbff",
+                    "#bac8da",
+                    "#d4bee5",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/nature-landscape-moon-gates-blue.png",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#c0c1ff",
+                    "#c6c4dd",
+                    "#e9b9d3",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/nature-landscape-winter-white-blue2.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#b2c4ff",
+                    "#c0c5dc",
+                    "#e1bbdb",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/nature-sea-dark-blue-gray.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#9ccaff",
+                    "#bac8db",
+                    "#d5bee5",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/sand_dune_sunrise_sun_sky_dark_person.png",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#ffb68a",
+                    "#e5bfa9",
+                    "#cbc992",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/susnet10.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#b3c5ff",
+                    "#c1c6dd",
+                    "#e2bbdc",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokykonight-landscape12-clouds.png",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#c0c1ff",
+                    "#c6c4dd",
+                    "#e9b9d3",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyocity.png",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#ffb68e",
+                    "#e6beaa",
+                    "#cdc991",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-animegirl2.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#bcc2ff",
+                    "#c4c5dd",
+                    "#e6bad6",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-eyes.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#eab2ff",
+                    "#d4c0d7",
+                    "#f5b7b5",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-skeleton.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#a6c8ff",
+                    "#bcc7dc",
+                    "#dabde2",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-landscape2.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#adc6ff",
+                    "#bfc6dc",
+                    "#debcdf",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-landscape35-sands-dark-blue.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#acc7ff",
+                    "#bec6dc",
+                    "#ddbce0",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-landscape8-xp.png",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#8ccdff",
+                    "#b7c9d9",
+                    "#cfc0e8",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-landscape28-mountains.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#a1c9ff",
+                    "#bbc7db",
+                    "#d8bde4",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-landscape34-temple-dark-blue.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#ffb4a8",
+                    "#e7bdb6",
+                    "#dec38c",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-temple2-orig.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#a0c9ff",
+                    "#bbc7db",
+                    "#d7bde4",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-landscape7-temple.png",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#ffb4aa",
+                    "#e7bdb7",
+                    "#dfc38c",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-landscape26-sun-red-blue.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#aec6ff",
+                    "#bfc6dc",
+                    "#dfbbde",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-landscape-mountains-blue.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#ffb959",
+                    "#dec2a2",
+                    "#bacd9f",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-landscape12-road-blue-yellow.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#eab2ff",
+                    "#d4c0d7",
+                    "#f5b7b5",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-landscape22-blue.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#9ecaff",
+                    "#bbc7db",
+                    "#d6bee4",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-arch-water-blue.png",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#b6c4ff",
+                    "#c2c5dd",
+                    "#e3bada",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-arch-blue.png",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#acc7ff",
+                    "#bec6dc",
+                    "#ddbce0",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/linux-gnu-blue-dark-white.png",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "content",
+                "paletteColors": [
+                    "#c0c7d0",
+                    "#c5c6ca",
+                    "#d1c2ce",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/night-city-lights-bridge-dark-red-gray.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#b1c5ff",
+                    "#bfc6dc",
+                    "#e0bbdc",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/sunset4-black-yellow.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#a3c8ff",
+                    "#bcc6db",
+                    "#d9bce2",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/nature-landscape-sea-dark-blue.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#4cd9e1",
+                    "#b1cccd",
+                    "#b6c7e9",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-cartoon.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#abc6ff",
+                    "#bec6db",
+                    "#ddbbdf",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-street50-sky-blue.png",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#ffb59a",
+                    "#e7beaf",
+                    "#d4c78e",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/night-city-lights-dark-yellow-gray.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#a7c8ff",
+                    "#bdc7dc",
+                    "#dbbce1",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/sky_sun_tree_waterfall_mountains_water_clouds_rocks_hill_red_tokyo.png",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#a7c8ff",
+                    "#bdc7dc",
+                    "#dbbce1",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-street36.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#ffb4a7",
+                    "#e7bdb6",
+                    "#ddc48c",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/samurai-red.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#9ecaff",
+                    "#bbc7db",
+                    "#d6bee4",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/anime-water-pool.png",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#ffacec",
+                    "#dbbed1",
+                    "#f5b9a4",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/field-car-magenta.jpeg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#ffb4a7",
+                    "#e7bdb5",
+                    "#ddc48c",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/anime-women-circle-orange.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#b0c6ff",
+                    "#c0c6dc",
+                    "#e0bbdd",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/perfectblue_purple_girl_flowers_fish_hands-orig.png",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#ffb4a7",
+                    "#e7bdb6",
+                    "#ddc48c",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/6598aece76dcb074376b218bb1163267.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#81cfff",
+                    "#b6c9d8",
+                    "#ccc1e9",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/abstract_sky_minimalism_hole_person_black_nordic_cold_stars.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#a1c9ff",
+                    "#bbc7db",
+                    "#d8bde3",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/sea-bridge-sky-blue-orange.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#c4c0ff",
+                    "#c7c4dc",
+                    "#ebb9d0",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/tokyonight-room-window.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#ffb5a1",
+                    "#e7bdb2",
+                    "#d9c58d",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/moonlit-night-dark-orange-blue.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#cabeff",
+                    "#c9c3dc",
+                    "#edb8cc",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/temple-dark-magenta.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#ffb59e",
+                    "#e7bdb1",
+                    "#d8c68d",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/sunset-dark-orange.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#ffb4aa",
+                    "#e7bdb7",
+                    "#dfc38c",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/sunset-dark-red.jpg",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "tonal-spot",
+                "paletteColors": [
+                    "#ffb68e",
+                    "#e6beab",
+                    "#cdc991",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/fuji-mountains-sunset-dark-orange.png",
+                "useWallpaperColors": true
+            },
+            {
+                "appearance": "dark",
+                "colorScheme": "Tokyo Night",
+                "darkMode": true,
+                "generationMethod": "content",
+                "paletteColors": [
+                    "#ffb68e",
+                    "#ffb68e",
+                    "#c4d000",
+                    "#ffb4ab"
+                ],
+                "path": "/home/black/Pictures/wallpapers/temple-sunset-dark-orange.png",
+                "useWallpaperColors": true
+            }
+        ],
+        "fillColor": "#000000",
+        "fillMode": "crop",
+        "hideWallpaperFilenames": true,
+        "linkLightAndDarkWallpapers": true,
+        "monitorDirectories": [
+        ],
+        "overviewBlur": 0.4,
+        "overviewEnabled": false,
+        "overviewTint": 0.6,
+        "panelPosition": "center",
+        "randomIntervalSec": 900,
+        "setWallpaperOnAllMonitors": true,
+        "showHiddenFiles": false,
+        "skipStartupTransition": true,
+        "solidColor": "#1a1a2e",
+        "sortOrder": "date_asc",
+        "transitionDuration": 500,
+        "transitionEdgeSmoothness": 0.05,
+        "transitionType": [
+            "disc"
+        ],
+        "useOriginalImages": true,
+        "useSolidColor": false,
+        "useWallhaven": false,
+        "viewMode": "browse",
+        "wallhavenApiKey": "",
+        "wallhavenCategories": "111",
+        "wallhavenOrder": "desc",
+        "wallhavenPurity": "100",
+        "wallhavenQuery": "",
+        "wallhavenRatios": "",
+        "wallhavenResolutionHeight": "",
+        "wallhavenResolutionMode": "atleast",
+        "wallhavenResolutionWidth": "",
+        "wallhavenSorting": "relevance",
+        "wallpaperChangeMode": "random"
+    }
+}

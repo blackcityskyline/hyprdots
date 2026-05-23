@@ -1,0 +1,12 @@
+#!/bin/bash
+hyprctl switchxkblayout keyd-virtual-keyboard next
+sleep 0.1
+
+LAYOUT_FILE="/tmp/hypr-layout"
+if [ ! -f "$LAYOUT_FILE" ] || [ "$(cat $LAYOUT_FILE)" = "en" ]; then
+  echo "ru" >"$LAYOUT_FILE"
+  swayosd-client --custom-message " 🇷🇺 Russian" --custom-icon input-keyboard-symbolic
+else
+  echo "en" >"$LAYOUT_FILE"
+  swayosd-client --custom-message "🇺🇸 US English" --custom-icon input-keyboard-symbolic
+fi

@@ -1,0 +1,6 @@
+[sponsorblock]
+# Базовые настройки
+api_url = "https://sponsor.ajay.app"
+categories = ["sponsor", "intro", "outro", "interaction", "selfpromo", "music_offtopic"]
+skip_probability = 0.5
+seek_mode = "default"   # или "exact", "relative"

@@ -1,0 +1,74 @@
+-- youtube-subs.lua
+-- Загружает en + ru субтитры через yt-dlp.
+-- Использует --no-config чтобы игнорировать глобальный yt-dlp конфиг.
+-- j переключает только между en и ru.
+
+local utils = require("mp.utils")
+
+local function is_youtube(url)
+    if not url then return false end
+    return url:find("youtube%.com") ~= nil or url:find("youtu%.be") ~= nil
+end
+
+local function find_sub(tmpdir, langs)
+    for _, lang in ipairs(langs) do
+        local p = tmpdir .. "/sub." .. lang .. ".srt"
+        local f = io.open(p)
+        if f then f:close(); return p end
+        local res = utils.subprocess({
+            args = {"find", tmpdir, "-name", "sub." .. lang .. "*.srt"},
+            capture_stdout = true,
+        })
+        if res and res.stdout and res.stdout ~= "" then
+            local p2 = res.stdout:match("([^\n]+)")
+            if p2 then return p2 end
+        end
+    end
+    return nil
+end
+
+mp.register_event("file-loaded", function()
+    local url = mp.get_property("path")
+    if not is_youtube(url) then return end
+
+    mp.osd_message("⏳ Загружаю субтитры...", 10)
+
+    local tmpdir = "/tmp/mpv-subs-" .. tostring(os.time())
+    os.execute("mkdir -p " .. tmpdir)
+
+    mp.command_native_async({
+        name = "subprocess",
+        args = {
+            "yt-dlp",
+            "--no-config",          -- игнорируем глобальный конфиг
+            "--write-subs",
+            "--write-auto-subs",
+            "--sub-langs", "en,en-orig,ru",
+            "--sub-format", "srt",
+            "--skip-download",
+            "--no-warnings",
+            "--cookies-from-browser", "firefox:~/.zen/1pstlpwy.black",
+            "-o", tmpdir .. "/sub",
+            url
+        },
+        capture_stdout = false,
+        capture_stderr = false,
+    }, function(success, result, error)
+        local en = find_sub(tmpdir, {"en-orig", "en"})
+        local ru = find_sub(tmpdir, {"ru"})
+
+        if en then
+            mp.commandv("sub-add", en, "select")
+        end
+        if ru then
+            mp.commandv("sub-add", ru, "auto")
+        end
+
+        if en or ru then
+            mp.set_property("sub-visibility", "yes")
+            mp.osd_message("✓ en" .. (ru and " + ru" or "") .. "  (j — переключить)", 3)
+        else
+            mp.osd_message("✗ Субтитры не найдены", 3)
+        end
+    end)
+end)

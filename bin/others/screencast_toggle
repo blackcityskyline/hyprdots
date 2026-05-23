@@ -1,0 +1,32 @@
+#!/bin/bash
+# Тоггл записи экрана — запускает или останавливает screencast
+# Используется как команда кнопки в swaync
+
+PIDFILE="/tmp/screencast.pid"
+SCREENCAST="$HOME/bin/others/screencast_unmuted"
+
+notify() {
+  local title="$1" msg="$2"
+  echo "$title: $msg"
+  command -v notify-send &>/dev/null && notify-send "$title" "$msg"
+}
+
+if [ -f "$PIDFILE" ]; then
+  PID=$(cat "$PIDFILE" 2>/dev/null)
+  if [ -n "$PID" ] && kill -0 "$PID" 2>/dev/null; then
+    # Запись идёт — остановка
+    kill -SIGINT "$PID" 2>/dev/null
+    rm -f "$PIDFILE"
+    notify "Запись экрана" "Остановлена"
+  else
+    # Pidfile есть но процесс мёртв — почистить и запустить заново
+    rm -f "$PIDFILE"
+    swaync-client -t -sw
+    systemd-run --user --scope --no-block --unit=screencast "$SCREENCAST" &>/tmp/screencast.log
+  fi
+else
+  # Записи нет — закрыть swaync и запустить через systemd-run
+  # чтобы процесс не был дочерним swaync
+  swaync-client -t -sw
+  systemd-run --user --scope --no-block --unit=screencast "$SCREENCAST" &>/tmp/screencast.log
+fi

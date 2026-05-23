@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+if [ -n "$2" ]; then
+  alacritty -e fish -c "bash '$2'; exec fish"
+else
+  alacritty -e fish
+fi

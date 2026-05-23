@@ -1,0 +1,8 @@
+{
+  "resultFile": "/tmp/noctalia-dmenu-result",
+  "showToastOnSelect": false,
+  "maxResults": 200,
+  "panelPosition": "top_left",
+  "showMatchCount": true,
+  "showFooter": true
+}

@@ -1,0 +1,223 @@
+# =============================================================================
+# pkglist-base — системные пакеты, драйверы, аудио, сеть
+# =============================================================================
+
+# ── Система ───────────────────────────────────────────────────────────────────
+base
+base-devel
+linux-firmware
+intel-ucode
+grub
+grub-btrfs
+grub-hook
+efibootmgr
+os-prober
+sudo
+
+# ── Ядро ─────────────────────────────────────────────────────────────────────
+linux
+linux-headers
+linux-lts            # запасное ядро
+linux-lts-headers
+
+# ── Драйверы Intel (HD 4000 / Ivy Bridge) ────────────────────────────────────
+mesa
+libva-intel-driver   # i965 — для старого Intel
+vulkan-intel
+lib32-mesa
+lib32-vulkan-intel
+
+# ── Драйверы NVIDIA (GT 740M / Kepler — legacy) ──────────────────────────────
+nvidia-470xx-dkms        # CachyOS
+nvidia-470xx-utils       # CachyOS
+nvidia-470xx-settings    # CachyOS
+nvidia-prime             # CachyOS
+lib32-nvidia-470xx-utils # CachyOS
+opencl-nvidia-470xx      # CachyOS
+
+# ── Optimus ───────────────────────────────────────────────────────────────────
+switcheroo-control
+power-profiles-daemon
+
+# ── Wayland порталы ───────────────────────────────────────────────────────────
+xdg-desktop-portal
+xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk
+xdg-utils
+qt5-wayland
+qt6-wayland
+
+# ── X11 ───────────────────────────────────────────────────────────────────────
+xorg-server
+xorg-xinit
+xorg-xrandr
+xorg-xsetroot
+xorg-xprop
+xorg-xdpyinfo
+xorg-xwayland
+xf86-input-libinput
+xclip
+xdotool
+
+# ── Аудио (PipeWire) ─────────────────────────────────────────────────────────
+pipewire
+pipewire-alsa
+pipewire-audio
+pipewire-pulse
+lib32-pipewire
+gst-plugin-pipewire
+wireplumber
+alsa-utils
+alsa-firmware
+alsa-plugins
+pulseaudio-alsa
+pamixer
+
+# ── Display Manager ───────────────────────────────────────────────────────────
+sddm
+
+# ── Системные демоны ─────────────────────────────────────────────────────────
+dbus
+polkit
+upower
+udisks2
+gvfs
+gvfs-mtp             # MTP устройства
+fuse2
+fuse3
+fwupd
+zram-generator
+iwd
+profile-sync-daemon
+rtkit
+xl2tpd
+
+# ── Сеть ─────────────────────────────────────────────────────────────────────
+networkmanager
+bluez
+bluez-utils
+bluez-tools
+bluedevil
+bluetui
+bluetuith
+zerotier-one
+
+# ── Шрифты ───────────────────────────────────────────────────────────────────
+ttf-nerd-fonts-symbols
+ttf-jetbrains-mono-nerd
+ttf-hack
+ttf-opensans
+ttf-dejavu
+cantarell-fonts
+redhat-fonts
+
+
+# ── Утилиты ───────────────────────────────────────────────────────
+fzf
+fd
+findutils
+ripgrep
+zoxide
+eza
+dust                 # замена du
+duf                  # замена df
+sd                   # замена sed
+git-delta            # красивый diff
+hyperfine            # бенчмарк команд
+git
+wget
+curl
+less
+bat
+openssh
+bash-completion
+brightnessctl
+chwd
+cronie
+dnsmasq
+e2fsprogs
+efibootmgr
+efitools
+ethtool
+ex-vi-compat
+exfatprogs
+f2fs-tools
+gptfdisk
+glmark2
+hdparm
+hwdetect
+hwinfo
+intel-gpu-tools
+lsscsi
+lvm2
+mdadm
+mtools
+mtr
+neovim
+vim
+nfs-utils
+nmap
+ntfs-3g
+ntp
+pv
+reflector
+rwlrap
+snapper
+btrfs-progs
+btrfs-assistant
+btrfs-desktop-notification
+btrfsmaintenance
+tmux
+ufw
+upower
+usb_modeswitch
+usbutils
+vdpauinfo
+which
+wmutils-git
+wpa_supplicant
+btop
+htop
+nvtop
+bandwhich
+ncdu
+chafa
+lm_sensors
+speedtest-cli
+parui
+nmap
+
+# ── Дополнительные пакеты ───────────────────────────────────────────────────────
+ssh-list             # AUR
+wiper                # AUR
+nmtui-go
+yazi
+cargo-binstall       # AUR
+ranger
+systemd-manager-tui-bin
+fish
+fisher
+fish-autopair
+fish-pure-prompt
+hwinfo
+tor
+torsocks
+obfs4proxy
+imagemagick
+lm_sensors
+man-pages
+procps-ng
+rsync
+unrar
+unzip
+usbmuxd
+zip
+7zip
+fsarchiver
+lsb-release
+pantheon-geoclue2-agent
+pkgfile
+plocate
+sof-firmware
+wavemon
+wev

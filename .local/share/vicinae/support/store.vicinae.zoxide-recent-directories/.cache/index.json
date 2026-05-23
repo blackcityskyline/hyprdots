@@ -1,0 +1,29 @@
+{
+  "revision": "1",
+  "keys": {
+    "apps": {
+      "size": 818
+    },
+    "directories": {
+      "size": 9416
+    },
+    "gitProjects": {
+      "size": 639
+    }
+  },
+  "lru": [
+    {
+      "key": "gitProjects",
+      "lastUsedAt": 1779384255470
+    },
+    {
+      "key": "directories",
+      "lastUsedAt": 1779384122353
+    },
+    {
+      "key": "apps",
+      "lastUsedAt": 1779384122070
+    }
+  ],
+  "size": 10873
+}
